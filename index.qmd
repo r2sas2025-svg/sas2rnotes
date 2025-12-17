@@ -1,9 +1,140 @@
-# Preface {.unnumbered}
+# About {.unnumbered}
 
-This is a Quarto book.
+# Welcome to R for SAS Programmers
 
-To learn more about Quarto books visit <https://quarto.org/docs/books>.
+## Course Overview
 
-```{r}
-1 + 1
+This comprehensive course is designed specifically for **SAS programmers** who want to learn R programming. We'll leverage your existing knowledge of data manipulation, statistical analysis, and programming concepts to help you become proficient in R.
+
+## Learning Objectives
+
+By the end of this course, you will be able to:
+
+- **Understand R fundamentals**: Master R syntax, data types, and programming concepts
+- **Data manipulation**: Perform complex data transformations using `dplyr` and `base R`
+- **Statistical analysis**: Apply statistical methods and create models in R
+- **Data visualization**: Create compelling visualizations using `ggplot2`
+- **Reporting**: Generate dynamic reports with R Markdown and Quarto
+- **Bridge knowledge**: Map your SAS skills to equivalent R functions and workflows
+- **Best practices**: Write clean, efficient, and reproducible R code
+
+## Course Structure
+
+### Module 1: R Fundamentals for SAS Users
+- **Getting Started**
+  - R and RStudio installation and setup
+  - Understanding the R environment vs SAS environment
+  - Package management 
+  
+- **Basic R Syntax**
+  - R syntax compared to SAS syntax
+  - Variables and assignment operators
+  - Data types and structures
+  - Functions and help system
+
+### Module 2: Data Import and Export
+  - CSV, Excel and text files (`readr`, `readxl` packages)
+  - SAS dataset import (`haven` package) and export xpt files
+  - other formats (JSON, XML)
+  
+### Module 3: Data Manipulation - dplyr 
+- **Core dplyr Functions**
+  - `select()` vs `KEEP/DROP` statements
+  - `filter()` vs `WHERE` clause
+  - `mutate()` vs `assignment` statements
+  - `summarise()` vs `PROC MEANS`
+  - `group_by()` vs `BY` statement
+
+- **Advanced Data Manipulation**
+  - Joins equivalent to `PROC SQL` joins  
+  - Reshaping data (`tidyr` vs `PROC TRANSPOSE`)
+  - String manipulation (`stringr` vs SAS string functions)
+  
+### Module 4: Creation of ADSL dataset
+- **ADSL and ADVS Dataset Creation**
+  - Creating analysis variables
+  - Handling missing data and derivations
+  - creating ADSL xpt dataset
+
+### Module 5: Statistical Analysis
+- **Descriptive Statistics**
+  - Summary statistics (equivalent to `PROC UNIVARIATE`)
+  - Frequency tables (equivalent to `PROC FREQ`)
+  - Cross-tabulations and chi-square tests
+  - creation of tables like DM and AE outputs
+
+- **Statistical Modeling basics**
+  - Linear regression (equivalent to `PROC REG`)
+  - Logistic regression (equivalent to `PROC LOGISTIC`)
+  - ANOVA (equivalent to `PROC ANOVA`)
+  - Mixed models and advanced techniques
+  
+### Module 6: Package Develpment and testing
+- **Creating R Packages**
+  - Package structure and essential files
+  - Documenting functions with `roxygen2`
+  - Building and installing packages
+- **Testing with testthat**
+  - Writing unit tests for R functions
+  - Running tests and interpreting results
+
+### Module 7: Data Visualization
+- **Base R Graphics**
+  - Basic plots and customization
+  - Comparison with SAS/GRAPH
+
+- **ggplot2 - Grammar of Graphics**
+  - Understanding the layered approach
+  - Creating publication-ready plots
+  - Advanced visualization techniques
+
+### Module 8: Reporting and Documentation
+- **R Markdown and Quarto**
+  - Creating dynamic reports (equivalent to ODS output)
+  - Integrating code, results, and narrative
+  - Output formats: HTML, PDF, Word
+
+- **Reproducible Research**
+  - Project organization
+  - Version control with Git
+  - Best practices for code documentation
+
+## SAS to R Translation Guide
+
+| SAS Concept | R Equivalent | Package |
+|-------------|--------------|---------|
+| DATA step | `dplyr::mutate()` | dplyr |
+| PROC SQL | `dplyr` verbs | dplyr |
+| PROC MEANS | `dplyr::summarise()` | dplyr |
+| PROC FREQ | `table()`, `xtabs()` | base R |
+| PROC REG | `lm()` | base R |
+| PROC LOGISTIC | `glm()` | base R |
+| PROC TRANSPOSE | `tidyr::pivot_*()` | tidyr |
+| ODS OUTPUT | R Markdown/Quarto | rmarkdown/quarto |
+
+## Prerequisites
+
+- **SAS Experience**: Familiarity with SAS programming, data steps, and procedures
+- **Statistical Knowledge**: Basic understanding of statistical concepts
+- **Programming Basics**: Understanding of programming logic and data structures
+
+## Course Format
+
+- **Interactive Learning**: Hands-on exercises with real datasets
+- **Comparative Examples**: Side-by-side SAS and R code comparisons
+- **Practical Projects**: Real-world scenarios mimicking typical SAS workflows
+- **Reference Materials**: Quick reference guides and cheat sheets
+
+## Getting Started
+
+### Required Software
+1. **R** (version 4.3+): Download from [CRAN](https://cran.r-project.org/)
+2. **RStudio**: Download from [Posit](https://posit.co/download/rstudio-desktop/)
+3. **Essential Packages**: We'll install these as needed
+```{r eval=FALSE}
+   install.packages(c("tidyverse", "haven", "readxl", "rmarkdown"))
 ```
+> Tip: If you don't have sample SDTM/ADaM data yet, the chapters generate **small synthetic data** as a fallback so everything runs end-to-end.
+## contact
+For questions or feedback, reach out to **r2sas2025@gmail.com**
+

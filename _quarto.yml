@@ -3,10 +3,15 @@ project:
 
 book:
   title: "sas2rnotes"
-  author: "Norah Jones"
+  author: "Ram"
   date: "18/12/2025"
   chapters:
     - index.qmd
+    - part: "datatype & structure"
+      chapters:
+        - datatype_structure.qmd
+        - datatype_structure_exercise.qmd
+    - part: "data manipulation"
     - intro.qmd
     - summary.qmd
     - references.qmd
