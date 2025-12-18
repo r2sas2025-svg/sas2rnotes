@@ -4,29 +4,209 @@
     "href": "index.html",
     "title": "sas2rnotes",
     "section": "",
-    "text": "Preface\nThis is a Quarto book.\nTo learn more about Quarto books visit https://quarto.org/docs/books.\n\n1 + 1\n\n[1] 2",
+    "text": "About",
     "crumbs": [
-      "Preface"
+      "About"
+    ]
+  },
+  {
+    "objectID": "index.html#course-overview",
+    "href": "index.html#course-overview",
+    "title": "sas2rnotes",
+    "section": "Course Overview",
+    "text": "Course Overview\nThis comprehensive course is designed specifically for SAS programmers who want to learn R programming. We’ll leverage your existing knowledge of data manipulation, statistical analysis, and programming concepts to help you become proficient in R.",
+    "crumbs": [
+      "About"
+    ]
+  },
+  {
+    "objectID": "index.html#learning-objectives",
+    "href": "index.html#learning-objectives",
+    "title": "sas2rnotes",
+    "section": "Learning Objectives",
+    "text": "Learning Objectives\nBy the end of this course, you will be able to:\n\nUnderstand R fundamentals: Master R syntax, data types, and programming concepts\nData manipulation: Perform complex data transformations using dplyr and base R\nStatistical analysis: Apply statistical methods and create models in R\nData visualization: Create compelling visualizations using ggplot2\nReporting: Generate dynamic reports with R Markdown and Quarto\nBridge knowledge: Map your SAS skills to equivalent R functions and workflows\nBest practices: Write clean, efficient, and reproducible R code",
+    "crumbs": [
+      "About"
+    ]
+  },
+  {
+    "objectID": "index.html#course-structure",
+    "href": "index.html#course-structure",
+    "title": "sas2rnotes",
+    "section": "Course Structure",
+    "text": "Course Structure\n\nModule 1: R Fundamentals for SAS Users\n\nGetting Started\n\nR and RStudio installation and setup\nUnderstanding the R environment vs SAS environment\nPackage management\n\nBasic R Syntax\n\nR syntax compared to SAS syntax\nVariables and assignment operators\nData types and structures\nFunctions and help system\n\n\n\n\nModule 2: Data Import and Export\n\nCSV, Excel and text files (readr, readxl packages)\nSAS dataset import (haven package) and export xpt files\nother formats (JSON, XML)\n\n\n\nModule 3: Data Manipulation - dplyr\n\nCore dplyr Functions\n\nselect() vs KEEP/DROP statements\nfilter() vs WHERE clause\nmutate() vs assignment statements\nsummarise() vs PROC MEANS\ngroup_by() vs BY statement\n\nAdvanced Data Manipulation\n\nJoins equivalent to PROC SQL joins\n\nReshaping data (tidyr vs PROC TRANSPOSE)\nString manipulation (stringr vs SAS string functions)\n\n\n\n\nModule 4: Creation of ADSL dataset\n\nADSL and ADVS Dataset Creation\n\nCreating analysis variables\nHandling missing data and derivations\ncreating ADSL xpt dataset\n\n\n\n\nModule 5: Statistical Analysis\n\nDescriptive Statistics\n\nSummary statistics (equivalent to PROC UNIVARIATE)\nFrequency tables (equivalent to PROC FREQ)\nCross-tabulations and chi-square tests\ncreation of tables like DM and AE outputs\n\nStatistical Modeling basics\n\nLinear regression (equivalent to PROC REG)\nLogistic regression (equivalent to PROC LOGISTIC)\nANOVA (equivalent to PROC ANOVA)\nMixed models and advanced techniques\n\n\n\n\nModule 6: Package Develpment and testing\n\nCreating R Packages\n\nPackage structure and essential files\nDocumenting functions with roxygen2\nBuilding and installing packages\n\nTesting with testthat\n\nWriting unit tests for R functions\nRunning tests and interpreting results\n\n\n\n\nModule 7: Data Visualization\n\nBase R Graphics\n\nBasic plots and customization\nComparison with SAS/GRAPH\n\nggplot2 - Grammar of Graphics\n\nUnderstanding the layered approach\nCreating publication-ready plots\nAdvanced visualization techniques\n\n\n\n\nModule 8: Reporting and Documentation\n\nR Markdown and Quarto\n\nCreating dynamic reports (equivalent to ODS output)\nIntegrating code, results, and narrative\nOutput formats: HTML, PDF, Word\n\nReproducible Research\n\nProject organization\nVersion control with Git\nBest practices for code documentation",
+    "crumbs": [
+      "About"
+    ]
+  },
+  {
+    "objectID": "index.html#sas-to-r-translation-guide",
+    "href": "index.html#sas-to-r-translation-guide",
+    "title": "sas2rnotes",
+    "section": "SAS to R Translation Guide",
+    "text": "SAS to R Translation Guide\n\n\n\nSAS Concept\nR Equivalent\nPackage\n\n\n\n\nDATA step\ndplyr::mutate()\ndplyr\n\n\nPROC SQL\ndplyr verbs\ndplyr\n\n\nPROC MEANS\ndplyr::summarise()\ndplyr\n\n\nPROC FREQ\ntable(), xtabs()\nbase R\n\n\nPROC REG\nlm()\nbase R\n\n\nPROC LOGISTIC\nglm()\nbase R\n\n\nPROC TRANSPOSE\ntidyr::pivot_*()\ntidyr\n\n\nODS OUTPUT\nR Markdown/Quarto\nrmarkdown/quarto",
+    "crumbs": [
+      "About"
+    ]
+  },
+  {
+    "objectID": "index.html#prerequisites",
+    "href": "index.html#prerequisites",
+    "title": "sas2rnotes",
+    "section": "Prerequisites",
+    "text": "Prerequisites\n\nSAS Experience: Familiarity with SAS programming, data steps, and procedures\nStatistical Knowledge: Basic understanding of statistical concepts\nProgramming Basics: Understanding of programming logic and data structures",
+    "crumbs": [
+      "About"
+    ]
+  },
+  {
+    "objectID": "index.html#course-format",
+    "href": "index.html#course-format",
+    "title": "sas2rnotes",
+    "section": "Course Format",
+    "text": "Course Format\n\nInteractive Learning: Hands-on exercises with real datasets\nComparative Examples: Side-by-side SAS and R code comparisons\nPractical Projects: Real-world scenarios mimicking typical SAS workflows\nReference Materials: Quick reference guides and cheat sheets",
+    "crumbs": [
+      "About"
+    ]
+  },
+  {
+    "objectID": "index.html#getting-started",
+    "href": "index.html#getting-started",
+    "title": "sas2rnotes",
+    "section": "Getting Started",
+    "text": "Getting Started\n\nRequired Software\n\nR (version 4.3+): Download from CRAN\nRStudio: Download from Posit\nEssential Packages: We’ll install these as needed\n\n\n   install.packages(c(\"tidyverse\", \"haven\", \"readxl\", \"rmarkdown\"))\n\n\nTip: If you don’t have sample SDTM/ADaM data yet, the chapters generate small synthetic data as a fallback so everything runs end-to-end. ## contact For questions or feedback, reach out to r2sas2025@gmail.com",
+    "crumbs": [
+      "About"
+    ]
+  },
+  {
+    "objectID": "datatype_structure.html",
+    "href": "datatype_structure.html",
+    "title": "1  datatype and structure",
+    "section": "",
+    "text": "1.1 R as a calculator\nR can be used as a calculator following the order of operations using the basic arithmetic operators, although, the arithmetic equal sign (=) is the equivalent of ==.\n# simple calculations \n3*2\n\n[1] 6\n\n(59 + 73 + 2) / 3\n\n[1] 44.66667\n\n# complex calculations\npi/8\n\n[1] 0.3926991",
+    "crumbs": [
+      "datatype & structure",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>datatype and structure</span>"
+    ]
+  },
+  {
+    "objectID": "datatype_structure.html#storing-outputs",
+    "href": "datatype_structure.html#storing-outputs",
+    "title": "1  datatype and structure",
+    "section": "1.2 Storing outputs",
+    "text": "1.2 Storing outputs\nAn object can be created to assign the value of your operation to a specific variable name, which can be reused later in the R session. Using the object_name &lt;- value naming convention, you can assign (&lt;-) the value ((59 + 73 + 2) / 3) to an object_name simple_cal to look like simple_cal &lt;- (59 + 73 + 2) / 3 to store the evaluation of that calculation.\n\nx &lt;- 1:10\n\ny &lt;- 2*x\n\nsimple_cal &lt;- (59 + 73 + 2) / 3",
+    "crumbs": [
+      "datatype & structure",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>datatype and structure</span>"
+    ]
+  },
+  {
+    "objectID": "datatype_structure.html#loading-data-into-r",
+    "href": "datatype_structure.html#loading-data-into-r",
+    "title": "1  datatype and structure",
+    "section": "1.3 Loading data into R",
+    "text": "1.3 Loading data into R\nDepending on the formats for the files containing your data, we can use different base R functions to read and load data into memory\nR has two native data formats, Rdata (sometimes call Rda) and RDS.\nRdata can be selected R objects or a workspace, and RDS are single R object. R has base functions available to read the two native data formats, and some delimited files.\n\n# saving rdata\nsave(x, file = \"data/intro_1.RData\")\n# Save multiple objects\nsave(x, y, file = \"data/intro_2.RData\")\n\n# Saving the entire workspake \nsave.image(file=\"data/intro_program.RData\")\n\n# We can follow the syntax for saving single Rdata object to save Rds files\n# saveRDS(object, file = \"my_data.rds\")\n\n\n# loading Rdata or Rda files \nload(file = \"data/intro_program.RData\")\n\n# loading RDS\n# We can follow the syntax for read Rdata object to sread Rds files using the readRDS()\n\n\n# Comma delimited\nadsl_CSV &lt;- read.csv(\"data/adsl.csv\", header = TRUE)\n\n# Save CSV\nadsl_csv_save &lt;- write.csv(adsl_CSV, \"data/save_data/adsl.csv\", row.names=TRUE)\n\n\nadsl_TAB_save &lt;- write.table(\n  adsl_CSV,\n  \"data/save_data/adsl.txt\",\n  append = FALSE,\n  sep = \"\\t\",\n  dec = \".\",\n  row.names = TRUE,\n  col.names = TRUE\n)\n\n# Tab-delimited \nadsl_TAB &lt;- read.table(\"data/save_data/adsl.txt\", header = TRUE, sep = \"\\t\")",
+    "crumbs": [
+      "datatype & structure",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>datatype and structure</span>"
+    ]
+  },
+  {
+    "objectID": "datatype_structure.html#r-packages",
+    "href": "datatype_structure.html#r-packages",
+    "title": "1  datatype and structure",
+    "section": "1.4 R Packages",
+    "text": "1.4 R Packages\nR packages are a collection of reusable functions, compiled codes, documentation, sample data and tests. Some formats of data require the use of an R package in order to load that data into memory. Share-able R packages are typically stored in a repository such as the Comprehensive R Archive Network (CRAN), Bioconductor, and GitHub.",
+    "crumbs": [
+      "datatype & structure",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>datatype and structure</span>"
+    ]
+  },
+  {
+    "objectID": "datatype_structure.html#installing-r-packages",
+    "href": "datatype_structure.html#installing-r-packages",
+    "title": "1  datatype and structure",
+    "section": "1.5 Installing R packages",
+    "text": "1.5 Installing R packages\n\n# From CRAN\n#install.packages(\"insert_package_name\")\n# {haven} is used to import or export foreign statistical format files (SPSS, Stata, SAS)\ninstall.packages(\"haven\")\n\n# {readxl}\ninstall.packages(\"readxl\")\n\n\n# From Github\nremotes::install_github(\"pharmaverse/admiral\", ref = \"devel\")",
+    "crumbs": [
+      "datatype & structure",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>datatype and structure</span>"
+    ]
+  },
+  {
+    "objectID": "datatype_structure.html#using-r-packages-functions-from-an-r-package-and-accessing-help-pages",
+    "href": "datatype_structure.html#using-r-packages-functions-from-an-r-package-and-accessing-help-pages",
+    "title": "1  datatype and structure",
+    "section": "1.6 Using R packages, functions from an R package, and accessing help pages",
+    "text": "1.6 Using R packages, functions from an R package, and accessing help pages\nSince an R packages are a collection of functions, you can choose to load the entire package within R memory or just the needed function from that package. Usually, the order you choose to load your package does not make a difference, unless you are loading two or more packages that has functions with the same name. If you are loading two or more packages with a common function name, then the package loaded last will hide that function in the earlier packages, so in that case it is important to note the order you choose to load the packages.\n\n# read file using library call  \nlibrary(haven)\nadsl_sas &lt;- read_sas(\"data/adsl.sas7bdat\")\n\n\n# Reading Excel xls|xlsx files\n# read_excel reads both xls|xlsx files but read_xls and read_xlsx can also be used to read respective files\n\n# if NA are represented by another something other than blank then you can specified the NA value\n# within the read_excel() function",
+    "crumbs": [
+      "datatype & structure",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>datatype and structure</span>"
+    ]
+  },
+  {
+    "objectID": "datatype_structure.html#data-types",
+    "href": "datatype_structure.html#data-types",
+    "title": "1  datatype and structure",
+    "section": "1.7 Data types",
+    "text": "1.7 Data types\nR has different types of Datatype\n* Integer * numeric * Character * Logical * complex * raw\nBut we will focus on the top 4.\n\nset.seed(1234)\n\ntype_int &lt;- (1:5) \ntype_num &lt;- rnorm(5)\ntype_char &lt;- \"USUBJID\"\ntype_logl_1 &lt;- TRUE\ntype_logl_2 &lt;- FALSE\n\n\nclass(type_int)\n\n[1] \"integer\"\n\nclass(type_num)\n\n[1] \"numeric\"\n\nclass(type_logl_1)\n\n[1] \"logical\"\n\nclass(type_logl_2)\n\n[1] \"logical\"\n\nclass(type_char)\n\n[1] \"character\"",
+    "crumbs": [
+      "datatype & structure",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>datatype and structure</span>"
+    ]
+  },
+  {
+    "objectID": "datatype_structure.html#date-formats",
+    "href": "datatype_structure.html#date-formats",
+    "title": "1  datatype and structure",
+    "section": "1.8 Date formats",
+    "text": "1.8 Date formats\nThere are base R functions that can be used to format a date object similar to the Date9 formatted date variable from SAS. In addition, there are R packages available, such as {lubridate}, for more complex date/date time formatted objects.\n\n# using adsl_sas RFSTDTC\nclass(adsl_sas$RFSTDTC)\n\n# Convert the date from that adsl_sas into a date variable\nadsl_date &lt;- as.Date(adsl_sas$RFSTDTC, \"%m/%d/%Y\")\nclass(adsl_date)\n\n\nlibrary(lubridate)\ndate9 &lt;- as_date(18757)\nadsl_sas$RFSTDTC &lt;- ymd(adsl_sas$RFSTDTC)\nclass(adsl_sas$RFSTDTC)",
+    "crumbs": [
+      "datatype & structure",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>datatype and structure</span>"
+    ]
+  },
+  {
+    "objectID": "datatype_structure.html#structures",
+    "href": "datatype_structure.html#structures",
+    "title": "1  datatype and structure",
+    "section": "1.9 Structures",
+    "text": "1.9 Structures\nData structures are dimensional ways of organizing the data. There are different data structures in R, let’s focus on vectors and dataframe\nVectors are 1 dimensional collection of data that can contain one or more element of the same data type\n\nvect_1 &lt;- 2\nvect_2 &lt;- c(2, \"USUBJID\")\n\nclass(vect_1)\nclass(vect_2)\n\n# Saving vectors from a dataset to a specific variable\nusubjid &lt;- adsl_sas$USUBJID\nsubjid &lt;- adsl_sas[, 3]\n\nDataframe is similar to SAS data sets and are 2 dimensional collection of vectors. Dataframe can store vectors of different types but must be of the same length\n\ndf &lt;- data.frame(\n  age = c(65, 20, 37,19,45),\n  seq = (1:5),\n  type_logl = c(TRUE,FALSE, TRUE, TRUE, FALSE),\n  usubjid = c(\"001-940-9785\",\"002-950-9726\",\"003-940-9767\",\"004-940-9795\",\"005-940-9734\")\n)\n\n# str() provides the data structure for each object in the dataframe\nstr(df)\n\n'data.frame':   5 obs. of  4 variables:\n $ age      : num  65 20 37 19 45\n $ seq      : int  1 2 3 4 5\n $ type_logl: logi  TRUE FALSE TRUE TRUE FALSE\n $ usubjid  : chr  \"001-940-9785\" \"002-950-9726\" \"003-940-9767\" \"004-940-9795\" ...\n\n# In addition to the data structure per variable, also get some descriptive statistics \nsummary(df)\n\n      age            seq    type_logl         usubjid         \n Min.   :19.0   Min.   :1   Mode :logical   Length:5          \n 1st Qu.:20.0   1st Qu.:2   FALSE:2         Class :character  \n Median :37.0   Median :3   TRUE :3         Mode  :character  \n Mean   :37.2   Mean   :3                                     \n 3rd Qu.:45.0   3rd Qu.:4                                     \n Max.   :65.0   Max.   :5",
+    "crumbs": [
+      "datatype & structure",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>datatype and structure</span>"
+    ]
+  },
+  {
+    "objectID": "datatype_structure_exercise.html",
+    "href": "datatype_structure_exercise.html",
+    "title": "2  datatype and structure exercise",
+    "section": "",
+    "text": "3 Exercise 1\nInstall and load the following packages\n{tidyverse} {admiral} {dplyr} {tidyr} {admiral.test}\n\n\nShow solution\n#installing the packages\ninstall.packages(c(\"tidyverse\", \"admiral\", \"dplyr\", \"tidyr\"))\n\nlibrary(tidyverse)\nlibrary(admiral)\nlibrary(admiral.test)\nlibrary(dplyr)\nlibrary(tidyr)\n\n\n\n\n4 Exercise 2\nImport adsl.sas7bdat as adsl\n\n\nShow solution\nlibrary(haven)\nadsl &lt;-  read_sas(\"data/adsl.sas7bdat\")",
+    "crumbs": [
+      "datatype & structure",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>datatype and structure exercise</span>"
     ]
   },
   {
     "objectID": "intro.html",
     "href": "intro.html",
-    "title": "1  Introduction",
+    "title": "3  Introduction",
     "section": "",
     "text": "This is a book created from markdown and executable code.\nSee Knuth (1984) for additional discussion of literate programming.\n\n1 + 1\n\n[1] 2\n\n\n\n\n\n\nKnuth, Donald E. 1984. “Literate Programming.” Comput. J. 27 (2): 97–111. https://doi.org/10.1093/comjnl/27.2.97.",
     "crumbs": [
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Introduction</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Introduction</span>"
     ]
   },
   {
     "objectID": "summary.html",
     "href": "summary.html",
-    "title": "2  Summary",
+    "title": "4  Summary",
     "section": "",
     "text": "In summary, this book has no content whatsoever.\n\n1 + 1\n\n[1] 2",
     "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Summary</span>"
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Summary</span>"
     ]
   },
   {

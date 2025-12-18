@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Norah Jones">
+<meta name="author" content="Ram">
 <meta name="dcterms.date" content="2026-06-12">
 
 <title>sas2rnotes</title>
@@ -67,7 +67,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./intro.html" rel="next">
+<link href="./datatype_structure.html" rel="next">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -119,7 +119,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Preface</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">About</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -147,19 +147,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Preface</span></a>
+ <span class="menu-text">About</span></a>
   </div>
 </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">datatype &amp; structure</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./datatype_structure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">datatype and structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./datatype_structure_exercise.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">datatype and structure exercise</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">data manipulation</span></span>
+  </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./summary.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Summary</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Summary</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -178,7 +205,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#preface" id="toc-preface" class="nav-link active" data-scroll-target="#preface">Preface</a></li>
+  <li><a href="#about" id="toc-about" class="nav-link active" data-scroll-target="#about">About</a></li>
+  <li><a href="#welcome-to-r-for-sas-programmers" id="toc-welcome-to-r-for-sas-programmers" class="nav-link" data-scroll-target="#welcome-to-r-for-sas-programmers">Welcome to R for SAS Programmers</a>
+  <ul class="collapse">
+  <li><a href="#course-overview" id="toc-course-overview" class="nav-link" data-scroll-target="#course-overview">Course Overview</a></li>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link" data-scroll-target="#learning-objectives">Learning Objectives</a></li>
+  <li><a href="#course-structure" id="toc-course-structure" class="nav-link" data-scroll-target="#course-structure">Course Structure</a>
+  <ul class="collapse">
+  <li><a href="#module-1-r-fundamentals-for-sas-users" id="toc-module-1-r-fundamentals-for-sas-users" class="nav-link" data-scroll-target="#module-1-r-fundamentals-for-sas-users">Module 1: R Fundamentals for SAS Users</a></li>
+  <li><a href="#module-2-data-import-and-export" id="toc-module-2-data-import-and-export" class="nav-link" data-scroll-target="#module-2-data-import-and-export">Module 2: Data Import and Export</a></li>
+  <li><a href="#module-3-data-manipulation---dplyr" id="toc-module-3-data-manipulation---dplyr" class="nav-link" data-scroll-target="#module-3-data-manipulation---dplyr">Module 3: Data Manipulation - dplyr</a></li>
+  <li><a href="#module-4-creation-of-adsl-dataset" id="toc-module-4-creation-of-adsl-dataset" class="nav-link" data-scroll-target="#module-4-creation-of-adsl-dataset">Module 4: Creation of ADSL dataset</a></li>
+  <li><a href="#module-5-statistical-analysis" id="toc-module-5-statistical-analysis" class="nav-link" data-scroll-target="#module-5-statistical-analysis">Module 5: Statistical Analysis</a></li>
+  <li><a href="#module-6-package-develpment-and-testing" id="toc-module-6-package-develpment-and-testing" class="nav-link" data-scroll-target="#module-6-package-develpment-and-testing">Module 6: Package Develpment and testing</a></li>
+  <li><a href="#module-7-data-visualization" id="toc-module-7-data-visualization" class="nav-link" data-scroll-target="#module-7-data-visualization">Module 7: Data Visualization</a></li>
+  <li><a href="#module-8-reporting-and-documentation" id="toc-module-8-reporting-and-documentation" class="nav-link" data-scroll-target="#module-8-reporting-and-documentation">Module 8: Reporting and Documentation</a></li>
+  </ul></li>
+  <li><a href="#sas-to-r-translation-guide" id="toc-sas-to-r-translation-guide" class="nav-link" data-scroll-target="#sas-to-r-translation-guide">SAS to R Translation Guide</a></li>
+  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a></li>
+  <li><a href="#course-format" id="toc-course-format" class="nav-link" data-scroll-target="#course-format">Course Format</a></li>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting Started</a>
+  <ul class="collapse">
+  <li><a href="#required-software" id="toc-required-software" class="nav-link" data-scroll-target="#required-software">Required Software</a></li>
+  </ul></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -197,7 +247,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Norah Jones </p>
+             <p>Ram </p>
           </div>
   </div>
     
@@ -216,18 +266,246 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="preface" class="level1 unnumbered">
-<h1 class="unnumbered">Preface</h1>
-<p>This is a Quarto book.</p>
-<p>To learn more about Quarto books visit <a href="https://quarto.org/docs/books" class="uri">https://quarto.org/docs/books</a>.</p>
+<section id="about" class="level1 unnumbered">
+<h1 class="unnumbered">About</h1>
+</section>
+<section id="welcome-to-r-for-sas-programmers" class="level1">
+<h1>Welcome to R for SAS Programmers</h1>
+<section id="course-overview" class="level2">
+<h2 class="anchored" data-anchor-id="course-overview">Course Overview</h2>
+<p>This comprehensive course is designed specifically for <strong>SAS programmers</strong> who want to learn R programming. We’ll leverage your existing knowledge of data manipulation, statistical analysis, and programming concepts to help you become proficient in R.</p>
+</section>
+<section id="learning-objectives" class="level2">
+<h2 class="anchored" data-anchor-id="learning-objectives">Learning Objectives</h2>
+<p>By the end of this course, you will be able to:</p>
+<ul>
+<li><strong>Understand R fundamentals</strong>: Master R syntax, data types, and programming concepts</li>
+<li><strong>Data manipulation</strong>: Perform complex data transformations using <code>dplyr</code> and <code>base R</code></li>
+<li><strong>Statistical analysis</strong>: Apply statistical methods and create models in R</li>
+<li><strong>Data visualization</strong>: Create compelling visualizations using <code>ggplot2</code></li>
+<li><strong>Reporting</strong>: Generate dynamic reports with R Markdown and Quarto</li>
+<li><strong>Bridge knowledge</strong>: Map your SAS skills to equivalent R functions and workflows</li>
+<li><strong>Best practices</strong>: Write clean, efficient, and reproducible R code</li>
+</ul>
+</section>
+<section id="course-structure" class="level2">
+<h2 class="anchored" data-anchor-id="course-structure">Course Structure</h2>
+<section id="module-1-r-fundamentals-for-sas-users" class="level3">
+<h3 class="anchored" data-anchor-id="module-1-r-fundamentals-for-sas-users">Module 1: R Fundamentals for SAS Users</h3>
+<ul>
+<li><strong>Getting Started</strong>
+<ul>
+<li>R and RStudio installation and setup</li>
+<li>Understanding the R environment vs SAS environment</li>
+<li>Package management</li>
+</ul></li>
+<li><strong>Basic R Syntax</strong>
+<ul>
+<li>R syntax compared to SAS syntax</li>
+<li>Variables and assignment operators</li>
+<li>Data types and structures</li>
+<li>Functions and help system</li>
+</ul></li>
+</ul>
+</section>
+<section id="module-2-data-import-and-export" class="level3">
+<h3 class="anchored" data-anchor-id="module-2-data-import-and-export">Module 2: Data Import and Export</h3>
+<ul>
+<li>CSV, Excel and text files (<code>readr</code>, <code>readxl</code> packages)</li>
+<li>SAS dataset import (<code>haven</code> package) and export xpt files</li>
+<li>other formats (JSON, XML)</li>
+</ul>
+</section>
+<section id="module-3-data-manipulation---dplyr" class="level3">
+<h3 class="anchored" data-anchor-id="module-3-data-manipulation---dplyr">Module 3: Data Manipulation - dplyr</h3>
+<ul>
+<li><strong>Core dplyr Functions</strong>
+<ul>
+<li><code>select()</code> vs <code>KEEP/DROP</code> statements</li>
+<li><code>filter()</code> vs <code>WHERE</code> clause</li>
+<li><code>mutate()</code> vs <code>assignment</code> statements</li>
+<li><code>summarise()</code> vs <code>PROC MEANS</code></li>
+<li><code>group_by()</code> vs <code>BY</code> statement</li>
+</ul></li>
+<li><strong>Advanced Data Manipulation</strong>
+<ul>
+<li>Joins equivalent to <code>PROC SQL</code> joins<br>
+</li>
+<li>Reshaping data (<code>tidyr</code> vs <code>PROC TRANSPOSE</code>)</li>
+<li>String manipulation (<code>stringr</code> vs SAS string functions)</li>
+</ul></li>
+</ul>
+</section>
+<section id="module-4-creation-of-adsl-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="module-4-creation-of-adsl-dataset">Module 4: Creation of ADSL dataset</h3>
+<ul>
+<li><strong>ADSL and ADVS Dataset Creation</strong>
+<ul>
+<li>Creating analysis variables</li>
+<li>Handling missing data and derivations</li>
+<li>creating ADSL xpt dataset</li>
+</ul></li>
+</ul>
+</section>
+<section id="module-5-statistical-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="module-5-statistical-analysis">Module 5: Statistical Analysis</h3>
+<ul>
+<li><strong>Descriptive Statistics</strong>
+<ul>
+<li>Summary statistics (equivalent to <code>PROC UNIVARIATE</code>)</li>
+<li>Frequency tables (equivalent to <code>PROC FREQ</code>)</li>
+<li>Cross-tabulations and chi-square tests</li>
+<li>creation of tables like DM and AE outputs</li>
+</ul></li>
+<li><strong>Statistical Modeling basics</strong>
+<ul>
+<li>Linear regression (equivalent to <code>PROC REG</code>)</li>
+<li>Logistic regression (equivalent to <code>PROC LOGISTIC</code>)</li>
+<li>ANOVA (equivalent to <code>PROC ANOVA</code>)</li>
+<li>Mixed models and advanced techniques</li>
+</ul></li>
+</ul>
+</section>
+<section id="module-6-package-develpment-and-testing" class="level3">
+<h3 class="anchored" data-anchor-id="module-6-package-develpment-and-testing">Module 6: Package Develpment and testing</h3>
+<ul>
+<li><strong>Creating R Packages</strong>
+<ul>
+<li>Package structure and essential files</li>
+<li>Documenting functions with <code>roxygen2</code></li>
+<li>Building and installing packages</li>
+</ul></li>
+<li><strong>Testing with testthat</strong>
+<ul>
+<li>Writing unit tests for R functions</li>
+<li>Running tests and interpreting results</li>
+</ul></li>
+</ul>
+</section>
+<section id="module-7-data-visualization" class="level3">
+<h3 class="anchored" data-anchor-id="module-7-data-visualization">Module 7: Data Visualization</h3>
+<ul>
+<li><strong>Base R Graphics</strong>
+<ul>
+<li>Basic plots and customization</li>
+<li>Comparison with SAS/GRAPH</li>
+</ul></li>
+<li><strong>ggplot2 - Grammar of Graphics</strong>
+<ul>
+<li>Understanding the layered approach</li>
+<li>Creating publication-ready plots</li>
+<li>Advanced visualization techniques</li>
+</ul></li>
+</ul>
+</section>
+<section id="module-8-reporting-and-documentation" class="level3">
+<h3 class="anchored" data-anchor-id="module-8-reporting-and-documentation">Module 8: Reporting and Documentation</h3>
+<ul>
+<li><strong>R Markdown and Quarto</strong>
+<ul>
+<li>Creating dynamic reports (equivalent to ODS output)</li>
+<li>Integrating code, results, and narrative</li>
+<li>Output formats: HTML, PDF, Word</li>
+</ul></li>
+<li><strong>Reproducible Research</strong>
+<ul>
+<li>Project organization</li>
+<li>Version control with Git</li>
+<li>Best practices for code documentation</li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="sas-to-r-translation-guide" class="level2">
+<h2 class="anchored" data-anchor-id="sas-to-r-translation-guide">SAS to R Translation Guide</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>SAS Concept</th>
+<th>R Equivalent</th>
+<th>Package</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>DATA step</td>
+<td><code>dplyr::mutate()</code></td>
+<td>dplyr</td>
+</tr>
+<tr class="even">
+<td>PROC SQL</td>
+<td><code>dplyr</code> verbs</td>
+<td>dplyr</td>
+</tr>
+<tr class="odd">
+<td>PROC MEANS</td>
+<td><code>dplyr::summarise()</code></td>
+<td>dplyr</td>
+</tr>
+<tr class="even">
+<td>PROC FREQ</td>
+<td><code>table()</code>, <code>xtabs()</code></td>
+<td>base R</td>
+</tr>
+<tr class="odd">
+<td>PROC REG</td>
+<td><code>lm()</code></td>
+<td>base R</td>
+</tr>
+<tr class="even">
+<td>PROC LOGISTIC</td>
+<td><code>glm()</code></td>
+<td>base R</td>
+</tr>
+<tr class="odd">
+<td>PROC TRANSPOSE</td>
+<td><code>tidyr::pivot_*()</code></td>
+<td>tidyr</td>
+</tr>
+<tr class="even">
+<td>ODS OUTPUT</td>
+<td>R Markdown/Quarto</td>
+<td>rmarkdown/quarto</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="prerequisites" class="level2">
+<h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
+<ul>
+<li><strong>SAS Experience</strong>: Familiarity with SAS programming, data steps, and procedures</li>
+<li><strong>Statistical Knowledge</strong>: Basic understanding of statistical concepts</li>
+<li><strong>Programming Basics</strong>: Understanding of programming logic and data structures</li>
+</ul>
+</section>
+<section id="course-format" class="level2">
+<h2 class="anchored" data-anchor-id="course-format">Course Format</h2>
+<ul>
+<li><strong>Interactive Learning</strong>: Hands-on exercises with real datasets</li>
+<li><strong>Comparative Examples</strong>: Side-by-side SAS and R code comparisons</li>
+<li><strong>Practical Projects</strong>: Real-world scenarios mimicking typical SAS workflows</li>
+<li><strong>Reference Materials</strong>: Quick reference guides and cheat sheets</li>
+</ul>
+</section>
+<section id="getting-started" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
+<section id="required-software" class="level3">
+<h3 class="anchored" data-anchor-id="required-software">Required Software</h3>
+<ol type="1">
+<li><strong>R</strong> (version 4.3+): Download from <a href="https://cran.r-project.org/">CRAN</a></li>
+<li><strong>RStudio</strong>: Download from <a href="https://posit.co/download/rstudio-desktop/">Posit</a></li>
+<li><strong>Essential Packages</strong>: We’ll install these as needed</li>
+</ol>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>   <span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">"tidyverse"</span>, <span class="st">"haven"</span>, <span class="st">"readxl"</span>, <span class="st">"rmarkdown"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</div>
+<blockquote class="blockquote">
+<p>Tip: If you don’t have sample SDTM/ADaM data yet, the chapters generate <strong>small synthetic data</strong> as a fallback so everything runs end-to-end. ## contact For questions or feedback, reach out to <strong>r2sas2025@gmail.com</strong></p>
+</blockquote>
 
 
+</section>
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -635,8 +913,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="nav-page nav-page-previous">
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./intro.html" class="pagination-link" aria-label="Introduction">
-        <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./datatype_structure.html" class="pagination-link" aria-label="datatype and structure">
+        <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">datatype and structure</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
