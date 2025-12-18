@@ -361,7 +361,7 @@ my_data <- read.csv("file.csv", header = TRUE)  # Clear distinction
 
 ### Chaining Assignments
 
-```{r}
+```{r,eval=FALSE}
 # Multiple assignments in one line
 a <- b <- c <- 100
 print(paste("a =", a, "| b =", b, "| c =", c))
@@ -1210,8 +1210,7 @@ RUN;
 ```
 
 ## R (Base)
-```{r}
-#| eval: false
+```{r,eval=FALSE}
 
 # Base R approach
 analysis <- employees[employees$salary > 50000, ]
@@ -1222,7 +1221,7 @@ analysis <- analysis[, c("employee_id", "name", "salary", "bonus", "total_comp")
 ```
 
 ## R (tidyverse)
-```{r}
+```{r,eval=FALSE}
 # tidyverse approach (more readable)
 analysis <- employees_df %>%
     filter(salary > 50000) %>%
@@ -1901,8 +1900,7 @@ lm  # For most functions, just type the name
 
 ### Exploring Packages and Functions
 
-```{r}
-#| eval: false
+```{r,eval=FALSE}
 
 # List all installed packages
 installed.packages()
@@ -1921,8 +1919,7 @@ browseVignettes("dplyr")      # Browse all package vignettes
 
 ### Online Resources and Cheat Sheets
 
-```{r}
-#| eval: false
+```{r,eval=FALSE}
 
 # R documentation website
 # https://www.rdocumentation.org/
