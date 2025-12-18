@@ -85,7 +85,7 @@ R packages are a collection of reusable functions, compiled codes, documentation
 
 ## Installing R packages
 
-```{r eval=FALSE}
+```{r, eval=FALSE}
 # From CRAN
 #install.packages("insert_package_name")
 # {haven} is used to import or export foreign statistical format files (SPSS, Stata, SAS)
@@ -103,7 +103,7 @@ remotes::install_github("pharmaverse/admiral", ref = "devel")
 
 Since an R packages are a collection of functions, you can choose to load the entire package within R memory or just the needed function from that package. Usually, the order you choose to load your package does not make a difference, unless you are loading two or more packages that has functions with the same name. If you are loading two or more packages with a common function name, then the package loaded last will hide that function in the earlier packages, so in that case it is important to note the order you choose to load the packages.
 
-```{r}
+```{r,eval=FALSE}
 # read file using library call  
 library(haven)
 adsl_sas <- read_sas("data/adsl.sas7bdat")
@@ -144,7 +144,7 @@ class(type_char)
 
 There are base R functions that can be used to format a date object similar to the Date9 formatted date variable from SAS. In addition, there are R packages available, such as {lubridate}, for more complex date/date time formatted objects.
 
-```{r}
+```{r,eval=FALSE}
 # using adsl_sas RFSTDTC
 class(adsl_sas$RFSTDTC)
 
@@ -165,7 +165,7 @@ Data structures are dimensional ways of organizing the data. There are different
 
 **Vectors** are 1 dimensional collection of data that can contain one or more element of the same data type
 
-```{r }
+```{r,eval=FALSE }
 vect_1 <- 2
 vect_2 <- c(2, "USUBJID")
 
