@@ -332,7 +332,7 @@ Understanding variable assignment is crucial for writing effective R code.
 
 ### Three Assignment Operators
 
-```{r}
+```{r,eval=FALSE}
 # Left assignment with <- (RECOMMENDED)
 x <- 10
 patient_age <- 45
