@@ -1,196 +1,1986 @@
 ---
-title: "datatype and structure"
-format: html
-editor: visual
+title: "R Fundamentals for SAS Users"
+subtitle: "Basic R Syntax - A Comprehensive Guide"
+author: "Your Name"
+date: today
+execute: 
+  warning: false
+  message: false
 ---
 
-## R as a calculator
+# Introduction
 
-R can be used as a calculator following the order of operations using the basic arithmetic operators, although, the arithmetic equal sign (`=`) is the equivalent of `==`.
+This guide is designed for SAS users transitioning to R.  We'll cover fundamental R concepts by comparing them to familiar SAS constructs, providing comprehensive coverage of each topic.
 
-```{r}
-# simple calculations 
-3*2
-(59 + 73 + 2) / 3
-
-# complex calculations
-pi/8
-```
-
-## Storing outputs
-
-An object can be created to assign the value of your operation to a specific variable name, which can be reused later in the R session. Using the `object_name <- value` naming convention, you can assign (`<-`) the value (`(59 + 73 + 2) / 3`) to an `object_name` simple_cal to look like `simple_cal <- (59 + 73 + 2) / 3` to store the evaluation of that calculation.
+## Prerequisites
 
 ```{r}
+#| label: setup
+#| include: false
 
-x <- 1:10
+# Install required packages if needed
+required_packages <- c("tidyverse","data.table", "haven")
+# install.packages(required_packages)
 
-y <- 2*x
-
-simple_cal <- (59 + 73 + 2) / 3
-```
-
-## Loading data into R
-
-Depending on the formats for the files containing your data, we can use different base R functions to read and load data into memory
-
-R has two native data formats, **Rdata** (sometimes call Rda) and **RDS**.
-
-**Rdata** can be selected R objects or a workspace, and **RDS** are single R object. R has base functions available to read the two native data formats, and some delimited files.
-
-```{r eval=FALSE}
-# saving rdata
-save(x, file = "data/intro_1.RData")
-# Save multiple objects
-save(x, y, file = "data/intro_2.RData")
-
-# Saving the entire workspake 
-save.image(file="data/intro_program.RData")
-
-# We can follow the syntax for saving single Rdata object to save Rds files
-# saveRDS(object, file = "my_data.rds")
-
-
-# loading Rdata or Rda files 
-load(file = "data/intro_program.RData")
-
-# loading RDS
-# We can follow the syntax for read Rdata object to sread Rds files using the readRDS()
-
-
-# Comma delimited
-adsl_CSV <- read.csv("data/adsl.csv", header = TRUE)
-
-# Save CSV
-adsl_csv_save <- write.csv(adsl_CSV, "data/save_data/adsl.csv", row.names=TRUE)
-
-
-adsl_TAB_save <- write.table(
-  adsl_CSV,
-  "data/save_data/adsl.txt",
-  append = FALSE,
-  sep = "\t",
-  dec = ".",
-  row.names = TRUE,
-  col.names = TRUE
-)
-
-# Tab-delimited 
-adsl_TAB <- read.table("data/save_data/adsl.txt", header = TRUE, sep = "\t")
-```
-
-## R Packages
-
-R packages are a collection of reusable functions, compiled codes, documentation, sample data and tests. Some formats of data require the use of an R package in order to load that data into memory. Share-able R packages are typically stored in a repository such as the Comprehensive R Archive Network (CRAN), Bioconductor, and GitHub.
-
-## Installing R packages
-
-```{r, eval=FALSE}
-# From CRAN
-#install.packages("insert_package_name")
-# {haven} is used to import or export foreign statistical format files (SPSS, Stata, SAS)
-install.packages("haven")
-
-# {readxl}
-install.packages("readxl")
-
-
-# From Github
-remotes::install_github("pharmaverse/admiral", ref = "devel")
-```
-
-## Using R packages, functions from an R package, and accessing help pages
-
-Since an R packages are a collection of functions, you can choose to load the entire package within R memory or just the needed function from that package. Usually, the order you choose to load your package does not make a difference, unless you are loading two or more packages that has functions with the same name. If you are loading two or more packages with a common function name, then the package loaded last will hide that function in the earlier packages, so in that case it is important to note the order you choose to load the packages.
-
-```{r,eval=FALSE}
-# read file using library call  
+library(tidyverse)
+library(data.table)
 library(haven)
-adsl_sas <- read_sas("data/adsl.sas7bdat")
-
-
-# Reading Excel xls|xlsx files
-# read_excel reads both xls|xlsx files but read_xls and read_xlsx can also be used to read respective files
-
-# if NA are represented by another something other than blank then you can specified the NA value
-# within the read_excel() function
 ```
 
-## Data types
+---
 
-R has different types of **Datatype**\
-\* Integer \* numeric \* Character \* Logical \* complex \* raw
+# 1. R Syntax Compared to SAS Syntax
 
-But we will focus on the top 4.
+## Basic Code Structure and Comments
 
-```{r }
-set.seed(1234)
+Understanding how R code is structured compared to SAS is fundamental to making the transition.
 
-type_int <- (1:5) 
-type_num <- rnorm(5)
-type_char <- "USUBJID"
-type_logl_1 <- TRUE
-type_logl_2 <- FALSE
+: :: {.panel-tabset}
 
+## SAS
+```sas
+/* Multi-line comments in SAS 
+   can span multiple lines */
+* Single line comment with asterisk;
 
-class(type_int)
-class(type_num)
-class(type_logl_1)
-class(type_logl_2)
-class(type_char)
+/* Statements must end with semicolons */
+DATA mydata;
+    SET olddata;
+    new_var = old_var * 2;
+RUN;
+
+/* Procedures need RUN statements */
+PROC PRINT DATA=mydata;
+RUN;
+
+/* Case insensitive - these are all the same */
+data test;
+DATA test;
+Data test;
 ```
 
-## Date formats
+## R
+```{r}
+#| eval: false
 
-There are base R functions that can be used to format a date object similar to the Date9 formatted date variable from SAS. In addition, there are R packages available, such as {lubridate}, for more complex date/date time formatted objects.
+# Single line comments use hash symbol
+# There are no multi-line comments in base R
+# (though RStudio supports Ctrl+Shift+C for multiple lines)
 
-```{r,eval=FALSE}
-# using adsl_sas RFSTDTC
-class(adsl_sas$RFSTDTC)
+# Semicolons are optional but allowed
+new_var <- old_var * 2  # No semicolon needed
+new_var <- old_var * 2; # Semicolon allowed
 
-# Convert the date from that adsl_sas into a date variable
-adsl_date <- as.Date(adsl_sas$RFSTDTC, "%m/%d/%Y")
-class(adsl_date)
+# No RUN statements required - code executes immediately
+print(mydata)
 
-
-library(lubridate)
-date9 <- as_date(18757)
-adsl_sas$RFSTDTC <- ymd(adsl_sas$RFSTDTC)
-class(adsl_sas$RFSTDTC)
+# R is CASE SENSITIVE - these are different variables
+data <- 1
+Data <- 2
+DATA <- 3
 ```
 
-## Structures
+:::
 
-Data structures are dimensional ways of organizing the data. There are different data structures in R, let's focus on **vectors** and **dataframe**
+### Key Syntax Differences
 
-**Vectors** are 1 dimensional collection of data that can contain one or more element of the same data type
+| Aspect | SAS | R | Notes |
+|--------|-----|---|-------|
+| **Comment** | `/* */` or `*;` | `#` | R comments run to end of line only |
+| **Statement terminator** | `;` required | `;` optional | Most R code omits semicolons |
+| **Case sensitivity** | Not case-sensitive | **Case-sensitive** | Major difference!  |
+| **Assignment** | `=` | `<-` or `=` | `<-` is preferred in R |
+| **Block execution** | `RUN;` required | Automatic | Code executes line by line |
+| **Line continuation** | Automatic | Automatic with open brackets |
 
-```{r,eval=FALSE }
-vect_1 <- 2
-vect_2 <- c(2, "USUBJID")
-
-class(vect_1)
-class(vect_2)
-
-# Saving vectors from a dataset to a specific variable
-usubjid <- adsl_sas$USUBJID
-subjid <- adsl_sas[, 3]
-
-```
-
-**Dataframe** is similar to SAS data sets and are 2 dimensional collection of vectors. Dataframe can store vectors of different types but must be of the same length
+### Demonstrating Case Sensitivity
 
 ```{r}
-df <- data.frame(
-  age = c(65, 20, 37,19,45),
-  seq = (1:5),
-  type_logl = c(TRUE,FALSE, TRUE, TRUE, FALSE),
-  usubjid = c("001-940-9785","002-950-9726","003-940-9767","004-940-9795","005-940-9734")
+# In R, these are THREE DIFFERENT variables
+Variable <- 10
+variable <- 20
+VARIABLE <- 30
+
+print(Variable)  # Returns 10
+print(variable)  # Returns 20
+print(VARIABLE)  # Returns 30
+
+# This would cause confusion in SAS but works in R
+mydata <- data.frame(x = 1:5)
+MyData <- data.frame(x = 6:10)
+MYDATA <- data.frame(x = 11:15)
+
+# Each is a separate object
+nrow(mydata)  # 5
+nrow(MyData)  # 5
+nrow(MYDATA)  # 5
+```
+
+## Procedural vs Functional Programming Paradigm
+
+SAS and R have fundamentally different approaches to data manipulation and analysis.
+
+### SAS:  Step-by-Step Procedures
+
+```sas
+/* SAS uses distinct procedures with explicit steps */
+
+/* Step 1: Sort data */
+PROC SORT DATA=mydata OUT=sorted_data;
+    BY age;
+RUN;
+
+/* Step 2: Calculate statistics */
+PROC MEANS DATA=sorted_data MEAN STD;
+    VAR income;
+    CLASS gender;
+    OUTPUT OUT=summary_stats MEAN=avg_income STD=sd_income;
+RUN;
+
+/* Step 3: Print results */
+PROC PRINT DATA=summary_stats;
+RUN;
+```
+
+### R: Multiple Functional Approaches
+
+```{r}
+#| eval: false
+
+# Approach 1: Base R - function chaining
+sorted_data <- mydata[order(mydata$age), ]
+summary_stats <- aggregate(income ~ gender, data = sorted_data, 
+                          FUN = function(x) c(mean = mean(x), sd = sd(x)))
+print(summary_stats)
+
+# Approach 2: tidyverse - pipe operator (most similar to thinking in steps)
+summary_stats <- mydata %>%
+    arrange(age) %>%
+    group_by(gender) %>%
+    summarise(
+        avg_income = mean(income, na.rm = TRUE),
+        sd_income = sd(income, na.rm = TRUE)
+    )
+
+print(summary_stats)
+
+# Approach 3: data.table - high performance
+library(data.table)
+dt <- as.data.table(mydata)
+summary_stats <- dt[order(age)][, .(avg_income = mean(income), 
+                                     sd_income = sd(income)), 
+                                 by = gender]
+print(summary_stats)
+```
+
+### Understanding the Pipe Operator (`%>%` and `|>`)
+
+The pipe operator makes R code read more like SAS procedures:
+
+```{r}
+# Create sample data
+employees <- data.frame(
+    name = c("John", "Jane", "Bob", "Alice", "Charlie", "Diana"),
+    department = c("Sales", "IT", "IT", "Sales", "HR", "Sales"),
+    salary = c(50000, 75000, 68000, 52000, 48000, 55000),
+    years = c(2, 5, 3, 1, 4, 3)
 )
 
-# str() provides the data structure for each object in the dataframe
-str(df)
+# Without pipes (nested functions - hard to read)
+result1 <- head(arrange(filter(employees, department == "Sales"), desc(salary)), 3)
 
-# In addition to the data structure per variable, also get some descriptive statistics 
-summary(df)
+# With pipes (reads left to right, top to bottom)
+result2 <- employees %>%
+    filter(department == "Sales") %>%
+    arrange(desc(salary)) %>%
+    head(3)
+
+print(result2)
+
+# Native pipe |> (R 4.1+) - similar but slightly different
+result3 <- employees |>
+    filter(department == "Sales") |>
+    arrange(desc(salary)) |>
+    head(3)
+
+print(result3)
+```
+
+## Execution and Evaluation Models
+
+Understanding how R evaluates code differently from SAS helps avoid common pitfalls.
+
+### Sequential vs Expression-Based Execution
+
+**SAS**:  Executes in clearly defined DATA and PROC steps with explicit boundaries
+
+```sas
+/* SAS processes entire DATA step before moving to next step */
+DATA step1;
+    SET input_data;
+    x = 10;
+RUN;  /* Everything above completes before proceeding */
+
+DATA step2;
+    SET step1;
+    y = x + 5;  /* x is available because step1 completed */
+RUN;
+```
+
+**R**: Expression-based evaluation, code executes immediately
+
+```{r}
+# R executes line by line
+x <- 10            # Executes immediately
+y <- x + 5         # Can use x immediately
+z <- x + y         # Can use both x and y
+
+print(paste("x:", x, "y:", y, "z:", z))
+
+# Functions execute when called
+my_calculation <- function() {
+    a <- 100
+    b <- 200
+    return(a + b)
+}
+
+# Function is defined but not executed yet
+result <- my_calculation()  # Now it executes
+print(result)
+```
+
+### Lazy Evaluation in R
+
+R uses "lazy evaluation" - function arguments are only evaluated when actually used:
+
+```{r}
+# Demonstrating lazy evaluation
+my_function <- function(x, y, z) {
+    # If we return early, unused arguments never get evaluated
+    if (x > 0) {
+        return(x * 2)
+    }
+    # y and z are never evaluated if x > 0
+    return(y + z)
+}
+
+# This works even though second and third arguments would error
+result <- my_function(5, stop("Error in y!"), stop("Error in z!"))
+print(result)  # Returns 10, no errors
+
+# But this would cause an error
+# result <- my_function(-1, stop("Error in y!"), 10)  # ERROR!
+```
+
+### Vectorized Operations
+
+R operates on entire vectors at once (unlike SAS's row-by-row processing):
+
+```{r}
+# Create vectors
+vector1 <- c(1, 2, 3, 4, 5)
+vector2 <- c(10, 20, 30, 40, 50)
+
+# Vectorized operation - all elements at once
+result <- vector1 + vector2
+print(result)  # 11 22 33 44 55
+
+# Comparison to SAS approach
+# In SAS, you'd typically process row by row: 
+# DATA result;
+#     SET input;
+#     new_value = value1 + value2;
+# RUN;
+
+# In R, you can also do row-wise operations on data frames
+df <- data.frame(value1 = vector1, value2 = vector2)
+df$result <- df$value1 + df$value2
+print(df)
+```
+
+### Recycling Rules
+
+R automatically "recycles" shorter vectors to match longer ones:
+
+```{r}
+# Vector recycling
+short_vec <- c(1, 2)
+long_vec <- c(10, 20, 30, 40, 50, 60)
+
+# short_vec is recycled:  1, 2, 1, 2, 1, 2
+result <- short_vec + long_vec
+print(result)  # 11 22 31 42 51 62
+
+# Warning when lengths don't divide evenly
+vec1 <- c(1, 2, 3)
+vec2 <- c(10, 20, 30, 40, 50)
+# result <- vec1 + vec2  # Would give warning
+
+# Practical use:  add constant to all elements
+values <- c(100, 200, 300, 400)
+values_plus_10 <- values + 10  # 10 is recycled
+print(values_plus_10)
+```
+
+---
+
+# 2. Variables and Assignment Operators
+
+## Creating and Assigning Variables
+
+Understanding variable assignment is crucial for writing effective R code.
+
+### Three Assignment Operators
+
+```{r}
+# Left assignment with <- (RECOMMENDED)
+x <- 10
+patient_age <- 45
+department_name <- "Cardiology"
+
+# Left assignment with = (works but not preferred for variables)
+y = 20
+# Use = for function arguments:  mean(x, na.rm = TRUE)
+
+# Right assignment with -> (rarely used, but valid)
+30 -> z
+
+# All three created variables
+print(paste("x =", x, "| y =", y, "| z =", z))
+
+# Why <- is preferred: 
+# 1. Clearly distinguishes assignment from function arguments
+# 2. Consistent with R conventions and style guides
+# 3. Can be read as "gets" or "assign to"
+
+# Example of clarity with <-
+my_data <- read.csv("file.csv", header = TRUE)  # Clear distinction
+# vs
+# my_data = read.csv("file.csv", header = TRUE)  # Less clear
+```
+
+### Chaining Assignments
+
+```{r}
+# Multiple assignments in one line
+a <- b <- c <- 100
+print(paste("a =", a, "| b =", b, "| c =", c))
+
+# Assignment with computation
+result <- (x <- 5) + (y <- 10)
+print(paste("x =", x, "| y =", y, "| result =", result))
+
+# Practical example: assign and use
+data_subset <- subset(employees, salary > (threshold <- 50000))
+print(paste("Threshold used:", threshold))
+print(data_subset)
+```
+
+### Variable Naming Rules and Conventions
+
+```{r}
+# VALID variable names
+valid_name <- 1
+valid.name <- 2           # Dots allowed (unlike most languages)
+validName <- 3            # camelCase
+valid_name_123 <- 4       # Numbers allowed (but not at start)
+.hidden_var <- 5          # Starting with dot (hidden from ls())
+
+# Common naming conventions
+snake_case_variable <- "preferred in R"
+camelCaseVariable <- "common in some R code"
+dot.separated.name <- "traditional R style"
+PascalCase <- "typically for functions/classes"
+
+# INVALID variable names (will cause errors)
+# 123invalid <- 5          # ERROR:  Cannot start with number
+# invalid-name <- 6        # ERROR:  Hyphens not allowed (minus sign)
+# _invalid <- 7            # ERROR: Cannot start with underscore
+# my variable <- 8         # ERROR:  Spaces not allowed
+
+# Reserved words cannot be used as variable names
+reserved_words <- c("if", "else", "repeat", "while", "function", 
+                    "for", "in", "next", "break", "TRUE", "FALSE", 
+                    "NULL", "Inf", "NaN", "NA")
+print(reserved_words)
+
+# if <- 10  # ERROR: 'if' is reserved
+# BUT you can use them with backticks (not recommended)
+`if` <- 10
+print(`if`)
+```
+
+### Checking and Removing Variables
+
+```{r}
+# Create some variables
+var1 <- 100
+var2 <- 200
+var3 <- 300
+
+# List all variables in environment
+current_vars <- ls()
+print(current_vars)
+
+# Check if variable exists
+exists("var1")  # TRUE
+exists("var999")  # FALSE
+
+# Remove specific variables
+rm(var3)
+exists("var3")  # FALSE
+
+# Remove multiple variables
+rm(var1, var2)
+
+# Remove all variables (use with caution!)
+# rm(list = ls())
+```
+
+## Variable Scope and Environments
+
+Understanding scope is crucial for writing functions and avoiding bugs.
+
+### Local vs Global Scope
+
+```{r}
+# Global variable (available everywhere)
+global_var <- 100
+
+# Function with local variables
+my_function <- function() {
+    # Local variable (only exists inside function)
+    local_var <- 200
+    
+    # Can read global variables
+    print(paste("Inside function, global_var:", global_var))
+    print(paste("Inside function, local_var:", local_var))
+    
+    # Return something
+    return(local_var * 2)
+}
+
+# Call function
+result <- my_function()
+print(paste("Function returned:", result))
+
+# local_var doesn't exist outside function
+print(paste("Outside function, global_var:", global_var))
+# print(local_var)  # ERROR: object 'local_var' not found
+```
+
+### Modifying Global Variables from Functions
+
+```{r}
+# Global variable
+counter <- 0
+
+# Function that modifies local copy (default behavior)
+increment_local <- function() {
+    counter <- counter + 1  # Creates local 'counter'
+    print(paste("Inside increment_local:", counter))
+}
+
+increment_local()
+print(paste("Global counter after increment_local:", counter))  # Still 0! 
+
+# Function that modifies global variable (use <<- or assign)
+increment_global <- function() {
+    counter <<- counter + 1  # Modifies global 'counter'
+    print(paste("Inside increment_global:", counter))
+}
+
+increment_global()
+print(paste("Global counter after increment_global:", counter))  # Now 1! 
+
+increment_global()
+print(paste("Global counter after second call:", counter))  # Now 2!
+```
+
+### Understanding <<- Super Assignment
+super assignment operator `<<-` allows modification of variables in parent environments.
+
+```{r}
+# <<- searches parent environments until it finds the variable
+outer_function <- function() {
+    x <- 10  # Local to outer_function
+    
+    inner_function <- function() {
+        x <<- x + 5  # Modifies x in outer_function's environment
+        print(paste("Inside inner_function, x:", x))
+    }
+    
+    print(paste("Before inner_function, x:", x))
+    inner_function()
+    print(paste("After inner_function, x:", x))
+}
+
+outer_function()
+
+# Use cases for <<-: 
+# 1. Counters and state in function factories
+# 2. Caching/memoization
+# 3. Building interactive applications
+# WARNING: Use sparingly, can make code hard to understand
+```
+
+### Function Factories and Closures
+
+
+```{r}
+# Creating a function that returns a function
+create_counter <- function() {
+    count <- 0  # This variable persists across calls
+    
+    function() {
+        count <<- count + 1
+        return(count)
+    }
+}
+
+# Create two independent counters
+counter1 <- create_counter()
+counter2 <- create_counter()
+
+# Each maintains its own state
+print(counter1())  # 1
+print(counter1())  # 2
+print(counter1())  # 3
+
+print(counter2())  # 1
+print(counter2())  # 2
+
+# Practical example: create functions with specific parameters
+create_multiplier <- function(factor) {
+    function(x) {
+        return(x * factor)
+    }
+}
+
+times_2 <- create_multiplier(2)
+times_10 <- create_multiplier(10)
+
+print(times_2(5))   # 10
+print(times_10(5))  # 50
+```
+
+### Working with Environments Explicitly
+the default environment is the global environment, but you can use
+the `new.env()` function to create and manipulate environments directly.
+
+```{r}
+# Create new environment
+my_env <- new.env()
+
+# Assign variables to environment
+my_env$var1 <- 100
+my_env$var2 <- 200
+
+# Access environment variables
+print(my_env$var1)
+
+# List variables in environment
+ls(my_env)
+
+# Environments are passed by reference (not copied)
+modify_env <- function(env) {
+    env$var1 <- 999
+    env$new_var <- 777
+}
+
+modify_env(my_env)
+print(my_env$var1)     # 999 (modified!)
+print(my_env$new_var)  # 777 (added!)
+
+# This is different from regular objects which are copied
+```
+
+## Copy-on-Modify Behavior
+
+R's copy-on-modify system is important for understanding performance and memory usage.
+
+### Default Copy-on-Modify
+
+```{r}
+# Create original vector
+original <- c(1, 2, 3, 4, 5)
+
+# Assign to new variable (no copy yet!)
+copy_var <- original
+
+# Modify copy_var (NOW a copy is made)
+copy_var[1] <- 999
+
+# Original is unchanged
+print(original)   # 1 2 3 4 5
+print(copy_var)   # 999 2 3 4 5
+
+# Same with data frames
+original_df <- data.frame(x = 1:5, y = 6:10)
+copy_df <- original_df
+copy_df$x[1] <- 999
+
+print(original_df$x)  # 1 2 3 4 5 (unchanged)
+print(copy_df$x)      # 999 2 3 4 5 (modified)
+```
+
+### Implications for Function Arguments
+
+```{r}
+# Functions receive copies (so modifications don't affect original)
+modify_vector <- function(vec) {
+    vec[1] <- 999
+    print(paste("Inside function:", paste(vec, collapse = " ")))
+    return(vec)
+}
+
+my_vector <- c(1, 2, 3, 4, 5)
+result <- modify_vector(my_vector)
+
+print(paste("Original vector:", paste(my_vector, collapse = " ")))  # Unchanged
+print(paste("Returned vector:", paste(result, collapse = " ")))     # Modified
+```
+
+### Using Environments for True Reference Behavior
+
+When you need pass-by-reference behavior (like SAS datasets that get modified):
+
+```{r}
+# Environment approach (pass by reference)
+create_data_env <- function() {
+    env <- new.env()
+    env$data <- data.frame(id = 1:5, value = rnorm(5))
+    return(env)
+}
+
+modify_data <- function(data_env, new_value) {
+    data_env$data$value <- data_env$data$value + new_value
+}
+
+# Create data environment
+my_data_env <- create_data_env()
+print("Original:")
+print(my_data_env$data)
+
+# Modify (changes original!)
+modify_data(my_data_env, 100)
+print("After modification:")
+print(my_data_env$data)  # Modified! 
+
+# This is similar to how SAS datasets work
+```
+
+---
+
+# 3. Data Types and Structures
+
+## Atomic Data Types
+
+R has six atomic (basic) types. Understanding these is fundamental to data manipulation.
+
+### Numeric Types
+
+```{r}
+# Double (default numeric type in R)
+num_double <- 42.5
+class(num_double)
+typeof(num_double)
+
+# Integer (requires L suffix)
+num_integer <- 42L
+class(num_integer)
+typeof(num_integer)
+
+# Automatic conversion
+x <- 10      # Double
+y <- 10L     # Integer
+z <- x + y   # Result is double
+typeof(z)
+
+# Checking numeric types
+is.numeric(num_double)   # TRUE
+is.numeric(num_integer)  # TRUE
+is.integer(num_integer)  # TRUE
+is.integer(num_double)   # FALSE
+is.double(num_double)    # TRUE
+
+# Coercion
+as.integer(42.7)  # 42 (truncates)
+as.numeric("123")  # 123
+as.numeric("abc")  # NA with warning
+```
+
+### Character (String) Types
+
+```{r}
+# Creating character variables
+char1 <- "Hello"
+char2 <- 'World'  # Single or double quotes work
+char3 <- "Can include 'quotes' inside"
+
+# Multi-line strings
+multi_line <- "This is line 1
+This is line 2
+This is line 3"
+
+# String operations
+paste("Hello", "World")                    # "Hello World"
+paste0("No", "Space")                      # "NoSpace"
+paste("A", "B", "C", sep = "-")           # "A-B-C"
+sprintf("Patient %d has BMI %.2f", 101, 24.5)  # Formatted string
+
+# String manipulation
+toupper("hello")                           # "HELLO"
+tolower("HELLO")                           # "hello"
+nchar("Hello")                             # 5 (length)
+substr("Hello World", 1, 5)                # "Hello"
+gsub("o", "0", "Hello World")              # "Hell0 W0rld" (replace)
+
+# Check and convert
+is.character(char1)  # TRUE
+as.character(123)    # "123"
+```
+
+### Logical (Boolean) Types
+
+```{r}
+# Creating logical values
+flag1 <- TRUE
+flag2 <- FALSE
+flag3 <- T      # Shorthand (but TRUE preferred)
+flag4 <- F      # Shorthand (but FALSE preferred)
+
+# Logical operations
+TRUE & FALSE   # AND:  FALSE
+TRUE | FALSE   # OR:  TRUE
+!TRUE          # NOT:  FALSE
+TRUE && FALSE  # Short-circuit AND: FALSE (only evaluates what's needed)
+TRUE || FALSE  # Short-circuit OR: TRUE
+
+# Comparisons return logical
+5 > 3          # TRUE
+5 == 5         # TRUE
+5 != 3         # TRUE
+"a" %in% c("a", "b", "c")  # TRUE
+
+# Logical arithmetic (TRUE = 1, FALSE = 0)
+sum(c(TRUE, FALSE, TRUE, TRUE))     # 3
+mean(c(TRUE, FALSE, TRUE, TRUE))    # 0.75
+
+# Conversion
+as.logical(0)        # FALSE
+as.logical(1)        # TRUE
+as.logical("TRUE")   # TRUE
+as.logical("yes")    # NA
+```
+
+### Special Values
+
+```{r}
+# NA - Missing value (like .  in SAS)
+na_value <- NA
+is.na(na_value)   # TRUE
+
+# Different types of NA
+na_real <- NA_real_        # Numeric NA
+na_int <- NA_integer_      # Integer NA
+na_char <- NA_character_   # Character NA
+na_logical <- NA            # Logical NA
+
+# NULL - Absence of value (different from NA)
+null_value <- NULL
+is.null(null_value)  # TRUE
+length(NULL)         # 0
+length(NA)           # 1
+
+# Inf - Infinity
+inf_value <- Inf
+1 / 0                # Inf
+-1 / 0               # -Inf
+is.infinite(Inf)     # TRUE
+is.finite(Inf)       # FALSE
+
+# NaN - Not a Number
+nan_value <- NaN
+0 / 0                # NaN
+is.nan(nan_value)    # TRUE
+
+# Testing for special values
+test_values <- c(1, NA, NaN, Inf, -Inf)
+is.na(test_values)       # TRUE for NA and NaN
+is.nan(test_values)      # TRUE only for NaN
+is.infinite(test_values) # TRUE for Inf and -Inf
+is.finite(test_values)   # TRUE only for 1
+```
+
+### SAS to R Type Comparison
+
+```{r}
+# Create comparison table
+comparison <- data.frame(
+    SAS_Type = c("Numeric", "Character", "Logical (1/0)", ".  (missing)", "Date (numeric)"),
+    R_Type = c("numeric/integer", "character", "logical (TRUE/FALSE)", "NA", "Date class"),
+    Example = c("42.5 or 42L", '"text"', "TRUE/FALSE", "NA", 'as.Date("2025-12-18")'),
+    stringsAsFactors = FALSE
+)
+
+print(comparison)
+
+# Date example
+sas_date <- 19709  # SAS date value for 2025-12-18
+r_date <- as.Date("2025-12-18")
+print(r_date)
+print(class(r_date))
+
+# Convert between systems
+r_date_from_sas <- as.Date(sas_date, origin = "1960-01-01")
+print(r_date_from_sas)
+```
+
+## Vector Data Structures
+
+Vectors are the fundamental data structure in R - even single values are vectors of length 1.
+
+### Creating Vectors
+
+```{r}
+# Combine function c()
+numeric_vec <- c(1, 2, 3, 4, 5)
+char_vec <- c("apple", "banana", "cherry", "date")
+logical_vec <- c(TRUE, FALSE, TRUE, TRUE, FALSE)
+
+# Sequences
+seq1 <- 1:10                        # Simple sequence
+seq2 <- 10:1                        # Descending
+seq3 <- seq(0, 100, by = 10)        # With step
+seq4 <- seq(0, 1, length.out = 11)  # Specific length
+seq5 <- rep(5, times = 3)           # Repeat value
+seq6 <- rep(c(1, 2), times = 3)     # Repeat vector
+seq7 <- rep(c(1, 2), each = 3)      # Repeat each element
+
+print(seq1)
+print(seq3)
+print(seq6)  # 1 2 1 2 1 2
+print(seq7)  # 1 1 1 2 2 2
+```
+
+### Vector Properties and Operations
+
+```{r}
+# Vector properties
+vec <- c(10, 20, 30, 40, 50)
+
+length(vec)          # 5
+class(vec)           # "numeric"
+typeof(vec)          # "double"
+str(vec)             # Structure
+
+# Vectorized operations (applied element-wise)
+vec + 10             # 20 30 40 50 60
+vec * 2              # 20 40 60 80 100
+vec^2                # 100 400 900 1600 2500
+sqrt(vec)            # Square root of each element
+log(vec)             # Natural log of each element
+
+# Operations between vectors (element-wise)
+vec1 <- c(1, 2, 3, 4, 5)
+vec2 <- c(10, 20, 30, 40, 50)
+vec1 + vec2          # 11 22 33 44 55
+vec1 * vec2          # 10 40 90 160 250
+```
+
+### Named Vectors
+
+```{r}
+# Create named vector
+scores <- c(Math = 95, English = 88, Science = 92, History = 85)
+print(scores)
+
+# Access by name
+scores["Math"]
+scores[c("Math", "Science")]
+
+# Get names
+names(scores)
+
+# Add/modify names
+grades <- c(95, 88, 92, 85)
+names(grades) <- c("Math", "English", "Science", "History")
+print(grades)
+
+# Named vectors are useful for lookup tables
+month_days <- c(Jan = 31, Feb = 28, Mar = 31, Apr = 30, May = 31, Jun = 30,
+                Jul = 31, Aug = 31, Sep = 30, Oct = 31, Nov = 30, Dec = 31)
+month_days["Feb"]
+```
+
+### Vector Indexing and Subsetting
+
+which function is very useful for logical indexing.
+
+```{r}
+# Create vector for examples
+vec <- c(10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
+
+# Positive indexing (1-based, not 0-based like Python!)
+vec[1]               # First element:  10
+vec[5]               # Fifth element: 50
+vec[c(1, 3, 5)]      # Multiple elements: 10 30 50
+vec[1:5]             # Range: 10 20 30 40 50
+
+# Negative indexing (exclusion)
+vec[-1]              # All except first
+vec[-c(1, 2)]        # All except first two
+vec[-(1:5)]          # All except first five
+
+# Logical indexing (very powerful!)
+vec[vec > 50]        # Elements greater than 50
+vec[vec %% 2 == 0]   # Even elements
+vec[vec >= 30 & vec <= 70]  # Between 30 and 70
+
+# Which function (returns indices)
+which(vec > 50)      # Indices where condition is TRUE
+vec[which.max(vec)]  # Maximum value
+vec[which.min(vec)]  # Minimum value
+```
+
+### Vector Type Coercion
+
+```{r}
+# Vectors must be homogeneous (all same type)
+# R coerces to most flexible type:  logical < integer < double < character
+
+mixed1 <- c(1, 2, "three")     # All become character
+print(mixed1)
+class(mixed1)
+
+mixed2 <- c(TRUE, FALSE, 1, 2)  # All become numeric
+print(mixed2)
+class(mixed2)
+
+mixed3 <- c(TRUE, FALSE, "yes")  # All become character
+print(mixed3)
+class(mixed3)
+
+# Explicit coercion
+char_nums <- c("1", "2", "3", "4")
+as.numeric(char_nums)            # Convert to numeric
+
+logical_vals <- c(1, 0, 1, 1, 0)
+as.logical(logical_vals)         # Convert to logical
+```
+
+## Lists - Flexible Containers
+
+Lists can contain elements of different types and structures, including other lists.
+
+### Creating Lists
+
+```{r}
+# Basic list creation
+my_list <- list(
+    numbers = c(1, 2, 3, 4, 5),
+    text = "Hello World",
+    flag = TRUE,
+    matrix_data = matrix(1:6, nrow = 2),
+    nested_list = list(a = 10, b = 20)
+)
+
+print(my_list)
+str(my_list)  # Structure is very helpful for lists
+```
+
+### Accessing List Elements
+
+```{r}
+# Three ways to access list elements
+
+# 1. Using $ (by name)
+my_list$numbers
+my_list$text
+
+# 2. Using [[ ]] (by name or index) - extracts element
+my_list[["numbers"]]
+my_list[[1]]
+my_list[["nested_list"]]$a
+
+# 3. Using [ ] - returns a list
+my_list["numbers"]   # Returns list with one element
+my_list[1]           # Same
+class(my_list[[1]])  # "numeric"
+class(my_list[1])    # "list"
+
+# Accessing nested elements
+my_list$nested_list$a
+my_list[["nested_list"]][["a"]]
+my_list[[5]][[1]]
+```
+
+### Modifying Lists
+
+```{r}
+# Add new elements
+my_list$new_element <- c(100, 200, 300)
+my_list[["another_element"]] <- "New value"
+
+# Modify existing elements
+my_list$text <- "Modified text"
+
+# Remove elements
+my_list$new_element <- NULL
+
+# Append lists
+list1 <- list(a = 1, b = 2)
+list2 <- list(c = 3, d = 4)
+combined <- c(list1, list2)
+print(combined)
+
+# Get list names
+names(my_list)
+
+# Unnamed lists
+unnamed_list <- list(10, "text", TRUE)
+print(unnamed_list)
+unnamed_list[[2]]  # Access by index only
+```
+
+### Practical List Applications
+
+```{r}
+# Storing analysis results
+perform_analysis <- function(data) {
+    results <- list(
+        summary_stats = summary(data),
+        mean_value = mean(data, na.rm = TRUE),
+        sd_value = sd(data, na.rm = TRUE),
+        n_missing = sum(is.na(data)),
+        n_total = length(data)
+    )
+    return(results)
+}
+
+sample_data <- c(12, 15, 18, NA, 22, 25, 28, 31)
+analysis_results <- perform_analysis(sample_data)
+print(analysis_results)
+
+# Accessing results
+print(paste("Mean:", analysis_results$mean_value))
+print(paste("Missing values:", analysis_results$n_missing))
+```
+
+## Data Frames - R's Version of SAS Datasets
+
+Data frames are the primary structure for tabular data in R.
+
+### Creating Data Frames
+
+```{r}
+# Method 1: From vectors
+employees_df <- data.frame(
+    employee_id = 1:6,
+    name = c("John", "Jane", "Bob", "Alice", "Charlie", "Diana"),
+    department = c("Sales", "IT", "IT", "Sales", "HR", "Sales"),
+    salary = c(50000, 75000, 68000, 52000, 48000, 55000),
+    years_employed = c(2, 5, 3, 1, 4, 3),
+    full_time = c(TRUE, TRUE, FALSE, TRUE, TRUE, FALSE),
+    stringsAsFactors = FALSE  # Keep strings as character (important!)
+)
+
+print(employees_df)
+
+# Method 2: From lists
+emp_list <- list(
+    employee_id = 1:3,
+    name = c("John", "Jane", "Bob"),
+    salary = c(50000, 75000, 68000)
+)
+df_from_list <- as.data.frame(emp_list)
+print(df_from_list)
+
+# Method 3: Read from file (most common)
+# employees_df <- read.csv("employees. csv")
+# employees_df <- read.table("employees.txt", header = TRUE)
+```
+
+### Data Frame Properties
+
+```{r}
+# Dimensions
+nrow(employees_df)      # Number of rows
+ncol(employees_df)      # Number of columns
+dim(employees_df)       # Both:  rows, columns
+
+# Names
+names(employees_df)     # Column names
+colnames(employees_df)  # Same
+rownames(employees_df)  # Row names (usually just numbers)
+
+# Structure and summary
+str(employees_df)       # Structure (like PROC CONTENTS)
+summary(employees_df)   # Summary statistics
+head(employees_df, 3)   # First 3 rows
+tail(employees_df, 2)   # Last 2 rows
+glimpse(employees_df)   # tidyverse version (if loaded)
+```
+
+### Accessing Data Frame Elements
+
+```{r}
+# Access columns
+employees_df$name                    # By name with $
+employees_df[["name"]]               # By name with [[]]
+employees_df[, "name"]               # By name with [,]
+employees_df[, 2]                    # By position
+
+# Access rows
+employees_df[1, ]                    # First row
+employees_df[1:3, ]                  # First three rows
+
+# Access specific elements
+employees_df[1, 2]                   # Row 1, column 2
+employees_df[1, "name"]              # Row 1, column "name"
+employees_df$name[1]                 # Element 1 of column "name"
+
+# Multiple columns
+employees_df[, c("name", "salary")]
+employees_df[, c(2, 4)]
+
+# Subset with conditions
+employees_df[employees_df$salary > 50000, ]
+employees_df[employees_df$department == "Sales", ]
+employees_df[employees_df$salary > 50000 & employees_df$full_time, ]
+```
+
+### Modifying Data Frames
+
+```{r}
+# Add new column
+employees_df$bonus <- employees_df$salary * 0.10
+
+# Modify existing column
+employees_df$salary <- employees_df$salary * 1.05  # 5% raise
+
+# Add calculated column
+employees_df$total_comp <- employees_df$salary + employees_df$bonus
+
+# Delete column
+employees_df$bonus <- NULL
+
+# Rename columns
+names(employees_df)[names(employees_df) == "name"] <- "employee_name"
+
+# Add rows
+new_employee <- data.frame(
+    employee_id = 7,
+    employee_name = "Eve",
+    department = "IT",
+    salary = 70000,
+    years_employed = 2,
+    full_time = TRUE,
+    total_comp = 77000
+)
+employees_df <- rbind(employees_df, new_employee)
+
+# Reset column name back
+names(employees_df)[names(employees_df) == "employee_name"] <- "name"
+```
+
+### SAS DATA Step vs R Data Frame Operations
+
+: :: {.panel-tabset}
+
+## SAS
+```sas
+/* SAS DATA step */
+DATA analysis;
+    SET employees;
+    WHERE salary > 50000;
+    
+    /* Create variables */
+    bonus = salary * 0.10;
+    total_comp = salary + bonus;
+    
+    /* Conditional logic */
+    IF department = 'Sales' THEN sales_flag = 1;
+    ELSE sales_flag = 0;
+    
+    /* Keep specific variables */
+    KEEP employee_id name salary bonus total_comp;
+RUN;
+```
+
+## R (Base)
+```{r}
+#| eval: false
+
+# Base R approach
+analysis <- employees[employees$salary > 50000, ]
+analysis$bonus <- analysis$salary * 0.10
+analysis$total_comp <- analysis$salary + analysis$bonus
+analysis$sales_flag <- ifelse(analysis$department == "Sales", 1, 0)
+analysis <- analysis[, c("employee_id", "name", "salary", "bonus", "total_comp")]
+```
+
+## R (tidyverse)
+```{r}
+# tidyverse approach (more readable)
+analysis <- employees_df %>%
+    filter(salary > 50000) %>%
+    mutate(
+        bonus = salary * 0.10,
+        total_comp = salary + bonus,
+        sales_flag = if_else(department == "Sales", 1, 0)
+    ) %>%
+    select(employee_id, name, salary, bonus, total_comp)
+
+print(analysis)
+```
+
+:::
+
+## Matrices and Arrays
+
+Matrices (2D) and arrays (N-dimensional) are homogeneous data structures.
+
+### Creating and Using Matrices
+
+```{r}
+# Create matrix
+mat <- matrix(1:12, nrow = 3, ncol = 4)
+print(mat)
+
+# Matrix with specific fill pattern
+mat_byrow <- matrix(1:12, nrow = 3, ncol = 4, byrow = TRUE)
+print(mat_byrow)
+
+# Named dimensions
+mat_named <- matrix(1:12, nrow = 3, ncol = 4,
+                    dimnames = list(c("Row1", "Row2", "Row3"),
+                                   c("Col1", "Col2", "Col3", "Col4")))
+print(mat_named)
+
+# Matrix properties
+dim(mat)         # Dimensions
+nrow(mat)        # Number of rows
+ncol(mat)        # Number of columns
+length(mat)      # Total elements
+
+# Matrix indexing
+mat[1, 2]        # Element at row 1, column 2
+mat[1, ]         # First row
+mat[, 2]         # Second column
+mat[1: 2, 2: 3]    # Submatrix
+```
+
+### Matrix Operations
+
+```{r}
+# Create matrices for operations
+A <- matrix(c(1, 2, 3, 4), nrow = 2)
+B <- matrix(c(5, 6, 7, 8), nrow = 2)
+
+# Element-wise operations
+A + B            # Element-wise addition
+A * B            # Element-wise multiplication
+A / B            # Element-wise division
+
+# Matrix multiplication
+A %*% B          # Matrix product
+
+# Transpose
+t(A)
+
+# Inverse (if square and invertible)
+solve(A)
+
+# Determinant
+det(A)
+
+# Eigenvalues and eigenvectors
+eigen(A)
+```
+
+### Arrays (Multi-dimensional)
+
+```{r}
+# Create 3D array
+arr <- array(1:24, dim = c(3, 4, 2))
+print(arr)
+
+# Access elements
+arr[1, 2, 1]     # Single element
+arr[, , 1]       # First "slice"
+arr[1, , ]       # First row across all slices
+
+# Array properties
+dim(arr)
+length(arr)
+```
+
+## Tibbles - Modern Data Frames
+
+Tibbles are enhanced data frames from the tidyverse with better printing and behavior.
+
+### Creating Tibbles
+
+```{r}
+library(tibble)
+
+# Create tibble
+employees_tbl <- tibble(
+    employee_id = 1:6,
+    name = c("John", "Jane", "Bob", "Alice", "Charlie", "Diana"),
+    department = c("Sales", "IT", "IT", "Sales", "HR", "Sales"),
+    salary = c(50000, 75000, 68000, 52000, 48000, 55000),
+    start_date = as.Date(c("2023-01-15", "2020-06-01", "2022-03-10",
+                           "2024-02-20", "2021-09-05", "2022-11-12"))
+)
+
+print(employees_tbl)  # Better printing than data.frame
+
+# Tribble:  row-wise tibble creation
+employees_tribble <- tribble(
+    ~employee_id, ~name,      ~department, ~salary,
+    1,            "John",     "Sales",     50000,
+    2,            "Jane",     "IT",        75000,
+    3,            "Bob",      "IT",        68000
+)
+print(employees_tribble)
+```
+
+### Tibble vs Data Frame Differences
+
+```{r}
+# Difference 1: Printing
+# Data frames print everything, tibbles show first 10 rows
+df_large <- data.frame(x = 1:100, y = 101:200)
+tbl_large <- tibble(x = 1:100, y = 101:200)
+# print(df_large)   # Would print all 100 rows
+print(tbl_large)    # Prints first 10 rows nicely
+
+# Difference 2: Subsetting
+df <- data.frame(x = 1:3, y = 4:6)
+tbl <- tibble(x = 1:3, y = 4:6)
+
+df[, "x"]           # Returns vector
+tbl[, "x"]          # Returns tibble
+
+# Difference 3: Character vectors
+df_char <- data.frame(name = c("John", "Jane"))
+tbl_char <- tibble(name = c("John", "Jane"))
+
+str(df_char)        # Might convert to factor (depends on R version)
+str(tbl_char)       # Always character
+
+# Difference 4: Column names
+# Tibbles allow non-syntactic names
+tbl_special <- tibble(
+    `Column with spaces` = 1:3,
+    `2024` = 4:6
+)
+print(tbl_special)
+```
+
+### Converting Between Data Frames and Tibbles
+
+```{r}
+# Convert data frame to tibble
+df <- data.frame(x = 1:3, y = 4:6)
+tbl <- as_tibble(df)
+
+# Convert tibble to data frame
+tbl <- tibble(x = 1:3, y = 4:6)
+df <- as.data.frame(tbl)
+
+# Check type
+is.data.frame(tbl)   # TRUE (tibbles are also data frames)
+is_tibble(df)        # FALSE
+is_tibble(tbl)       # TRUE
+```
+
+## Data. table - High Performance Option
+
+Data.table is optimized for speed and memory efficiency with large datasets.
+
+### Creating Data.tables
+
+```{r}
+library(data.table)
+
+# Create data. table
+employees_dt <- data.table(
+    employee_id = 1:1000,
+    department = sample(c("Sales", "IT", "HR", "Finance"), 1000, replace = TRUE),
+    salary = round(rnorm(1000, mean = 60000, sd = 15000), 0),
+    years = sample(1:20, 1000, replace = TRUE)
+)
+
+print(head(employees_dt))
+
+# Convert from data frame
+df <- data.frame(x = 1:3, y = 4:6)
+dt <- as.data.table(df)
+```
+
+### Data.table Syntax:  DT[i, j, by]
+
+The data.table syntax follows the pattern: `DT[where, select, group by]`
+
+```{r}
+# i: Filter rows (WHERE clause)
+employees_dt[salary > 70000]
+employees_dt[department == "IT"]
+
+# j: Select/compute columns (SELECT clause)
+employees_dt[, .(employee_id, salary)]
+employees_dt[, mean_salary := mean(salary)]
+
+# by: Group by (GROUP BY clause)
+employees_dt[, .(avg_salary = mean(salary)), by = department]
+employees_dt[, .(count = .N), by = department]  # . N is row count
+
+# Combining i, j, by
+employees_dt[salary > 50000, 
+             .(avg_salary = mean(salary), count = .N), 
+             by = department]
+
+# Multiple group by
+employees_dt[, .(avg_salary = mean(salary)), 
+             by = .(department, years_bucket = cut(years, breaks = c(0, 5, 10, 20)))]
+```
+
+### Data.table Performance Advantages
+
+```{r}
+# Create large datasets for comparison
+n <- 1000000
+
+# Data frame approach
+df_large <- data.frame(
+    id = 1:n,
+    group = sample(letters[1:100], n, replace = TRUE),
+    value = rnorm(n)
+)
+
+# Data.table approach
+dt_large <- data.table(
+    id = 1:n,
+    group = sample(letters[1:100], n, replace = TRUE),
+    value = rnorm(n)
+)
+
+# Speed comparison:  group aggregation
+system.time({
+    result_df <- aggregate(value ~ group, data = df_large, FUN = mean)
+})
+
+system.time({
+    result_dt <- dt_large[, .(mean_value = mean(value)), by = group]
+})
+
+# data.table is typically much faster for large data operations
+```
+
+## Factors - Categorical Variables
+
+Factors represent categorical data, similar to SAS formats/value labels.
+
+### Creating Factors
+
+```{r}
+# Create factor from character vector
+gender_char <- c("M", "F", "F", "M", "M", "F")
+gender_factor <- factor(gender_char)
+print(gender_factor)
+
+# Levels are shown
+levels(gender_factor)
+
+# With explicit levels and labels
+gender_factor2 <- factor(
+    c("M", "F", "F", "M", "M", "F"),
+    levels = c("M", "F"),
+    labels = c("Male", "Female")
+)
+print(gender_factor2)
+
+# Ordered factors
+education <- factor(
+    c("HS", "BS", "MS", "PhD", "BS", "HS"),
+    levels = c("HS", "BS", "MS", "PhD"),
+    ordered = TRUE
+)
+print(education)
+print(education[2] < education[3])  # TRUE:  BS < MS
+```
+
+### Working with Factors
+
+```{r}
+# Factor properties
+levels(gender_factor)
+nlevels(gender_factor)
+is.factor(gender_factor)
+is.ordered(education)
+
+# Convert factor to character/numeric
+as.character(gender_factor)
+as.numeric(gender_factor)  # Returns level codes (1, 2, ...)
+
+# Reorder levels
+gender_reordered <- factor(gender_factor, levels = c("F", "M"))
+levels(gender_reordered)
+
+# Add levels
+gender_expanded <- factor(gender_factor, levels = c("M", "F", "O"))
+levels(gender_expanded)
+
+# Relabel levels
+levels(gender_factor) <- c("Male", "Female")
+print(gender_factor)
+```
+
+### Practical Uses for Factors
+
+```{r}
+# Create survey data
+survey <- data.frame(
+    id = 1:10,
+    satisfaction = factor(
+        c("High", "Low", "Medium", "High", "Low", "High", "Medium", "High", "Low", "Medium"),
+        levels = c("Low", "Medium", "High"),
+        ordered = TRUE
+    ),
+    region = factor(c("North", "South", "North", "West", "East", 
+                     "North", "South", "East", "West", "North"))
+)
+
+# Frequency tables (like PROC FREQ)
+table(survey$satisfaction)
+table(survey$region)
+table(survey$satisfaction, survey$region)  # Cross-tabulation
+
+# Proportions
+prop.table(table(survey$satisfaction))
+
+# Factors preserve level order in plots and analyses
+# (Very useful for ordered categories like satisfaction, education, etc.)
+```
+
+### Factor Pitfalls and Solutions
+
+```{r}
+# Pitfall 1: Factors look like characters but aren't
+factor_var <- factor(c("10", "20", "30"))
+# as.numeric(factor_var)  # Returns 1, 2, 3 (NOT 10, 20, 30!)
+as.numeric(as.character(factor_var))  # Returns 10, 20, 30 (correct)
+
+# Pitfall 2: Can't add values not in levels
+colors <- factor(c("red", "blue", "green"), levels = c("red", "blue", "green"))
+# colors[4] <- "yellow"  # Would produce NA (not an error!)
+
+# Solution: Add level first
+levels(colors) <- c(levels(colors), "yellow")
+colors[4] <- "yellow"
+print(colors)
+
+# Pitfall 3: stringsAsFactors in data.frame (older R versions)
+# In R < 4.0.0, characters were automatically converted to factors
+# Always use stringsAsFactors = FALSE or upgrade to R >= 4.0.0
+df_safe <- data.frame(
+    name = c("John", "Jane"),
+    stringsAsFactors = FALSE
+)
+str(df_safe)  # character, not factor
+```
+
+---
+
+# 4. Functions and Help System
+
+## Using Built-in Functions
+
+R has thousands of built-in functions for data analysis. 
+
+### Statistical Functions
+
+```{r}
+# Create sample data
+numbers <- c(12, 18, 23, 28, 15, NA, 34, 29, 19, 25)
+
+# Measures of central tendency
+mean(numbers, na.rm = TRUE)        # Mean
+median(numbers, na.rm = TRUE)      # Median
+# mode (no built-in mode function)
+
+# Measures of dispersion
+sd(numbers, na.rm = TRUE)          # Standard deviation
+var(numbers, na.rm = TRUE)         # Variance
+IQR(numbers, na.rm = TRUE)         # Interquartile range
+range(numbers, na.rm = TRUE)       # Min and max
+mad(numbers, na.rm = TRUE)         # Median absolute deviation
+
+# Summary statistics
+min(numbers, na.rm = TRUE)
+max(numbers, na.rm = TRUE)
+sum(numbers, na.rm = TRUE)
+prod(numbers, na.rm = TRUE)        # Product
+length(numbers)                     # Count all
+sum(! is.na(numbers))               # Count non-missing
+
+# Quantiles
+quantile(numbers, na.rm = TRUE)    # Default:  0%, 25%, 50%, 75%, 100%
+quantile(numbers, probs = c(0.1, 0.9), na.rm = TRUE)  # 10th and 90th percentiles
+
+# Summary function (multiple stats at once)
+summary(numbers)
+```
+
+### Mathematical Functions
+
+```{r}
+# Arithmetic
+abs(-5)                    # Absolute value
+sqrt(16)                   # Square root
+exp(2)                     # Exponential
+log(100)                   # Natural logarithm
+log10(100)                 # Base-10 logarithm
+log(8, base = 2)           # Custom base logarithm
+
+# Rounding
+round(3.14159, digits = 2) # 3.14
+floor(3.9)                 # 3 (round down)
+ceiling(3.1)               # 4 (round up)
+trunc(3.9)                 # 3 (truncate decimal)
+signif(123456, digits = 3) # 123000 (significant figures)
+
+# Trigonometry
+sin(pi/2)                  # 1
+cos(0)                     # 1
+tan(pi/4)                  # 1
+asin(1)                    # pi/2 (arcsin)
+
+# Powers and roots
+2^10                       # 1024
+10^3                       # 1000
+27^(1/3)                   # 3 (cube root)
+```
+
+### String Functions
+
+```{r}
+# Basic string operations
+text <- "  Hello World  "
+
+nchar(text)                          # Length (with spaces)
+toupper(text)                        # "  HELLO WORLD  "
+tolower(text)                        # "  hello world  "
+trimws(text)                         # Remove leading/trailing whitespace
+
+# Substring operations
+substr("Hello World", 1, 5)          # "Hello"
+substring("Hello World", 7)          # "World"
+
+# Search and replace
+grepl("World", text)                 # TRUE (pattern found)
+grep("World", c("Hello", "World", "Goodbye"))  # 2 (position)
+sub("World", "Universe", text)       # Replace first occurrence
+gsub("o", "0", text)                 # Replace all occurrences
+
+# Split strings
+strsplit("apple,banana,cherry", ",") # Split by delimiter
+
+# Paste strings
+paste("Hello", "World")              # "Hello World" (with space)
+paste0("Hello", "World")             # "HelloWorld" (no space)
+paste(c("A", "B", "C"), collapse = "-")  # "A-B-C"
+
+# Formatted strings (like sprintf in C)
+sprintf("Patient %d:  BMI = %.2f", 12345, 24.567)
+```
+
+### Type Checking and Conversion Functions
+
+```{r}
+# Type checking (is.* functions)
+x <- 42
+is.numeric(x)
+is.integer(x)
+is.character(x)
+is.logical(x)
+is.factor(x)
+is.data.frame(x)
+is.list(x)
+is.matrix(x)
+is.na(x)
+is.null(x)
+
+# Type conversion (as.* functions)
+as.character(42)              # "42"
+as.numeric("42")              # 42
+as.integer(42.7)              # 42 (truncates)
+as.logical(1)                 # TRUE
+as.factor(c("A", "B", "C"))
+as.data.frame(matrix(1:6, nrow = 2))
+as.list(c(1, 2, 3))
+as.matrix(data.frame(x = 1:3, y = 4:6))
+```
+
+## SAS PROC to R Function Mapping
+
+Here's a comprehensive mapping of common SAS procedures to R equivalents: 
+
+```{r}
+# Create mapping table
+sas_to_r <- data.frame(
+    SAS_Proc = c(
+        "PROC MEANS",
+        "PROC FREQ",
+        "PROC PRINT",
+        "PROC SORT",
+        "PROC CONTENTS",
+        "PROC SQL",
+        "PROC UNIVARIATE",
+        "PROC CORR",
+        "PROC REG",
+        "PROC LOGISTIC",
+        "PROC TABULATE",
+        "PROC TRANSPOSE",
+        "PROC IMPORT",
+        "PROC EXPORT"
+    ),
+    R_Function = c(
+        "summary(), mean(), sd()",
+        "table(), prop.table()",
+        "print(), head(), View()",
+        "sort(), order(), arrange()",
+        "str(), glimpse(), attributes()",
+        "sqldf(), dplyr verbs",
+        "summary(), psych::describe()",
+        "cor(), cor.test()",
+        "lm(), summary()",
+        "glm(family='binomial')",
+        "ftable(), aggregate()",
+        "t(), pivot_longer()/pivot_wider()",
+        "read.csv(), read_excel()",
+        "write.csv(), write_xlsx()"
+    ),
+    Package = c(
+        "base",
+        "base",
+        "base",
+        "base/dplyr",
+        "base/dplyr",
+        "sqldf/dplyr",
+        "base/psych",
+        "base",
+        "stats",
+        "stats",
+        "base/tidyr",
+        "base/tidyr",
+        "base/readxl",
+        "base/writexl"
+    ),
+    stringsAsFactors = FALSE
+)
+
+print(sas_to_r)
+```
+
+### Practical Examples:  SAS to R
+
+: :: {.panel-tabset}
+
+## PROC MEANS
+```{r}
+# Create data
+data <- data.frame(
+    group = rep(c("A", "B", "C"), each = 10),
+    value = c(rnorm(10, 100, 15), rnorm(10, 110, 15), rnorm(10, 95, 15))
+)
+
+# SAS:  PROC MEANS DATA=data MEAN STD MIN MAX; VAR value; CLASS group; RUN;
+
+# R (base)
+aggregate(value ~ group, data = data, 
+          FUN = function(x) c(mean = mean(x), sd = sd(x), 
+                             min = min(x), max = max(x)))
+
+# R (dplyr)
+data %>%
+    group_by(group) %>%
+    summarise(
+        n = n(),
+        mean = mean(value),
+        sd = sd(value),
+        min = min(value),
+        max = max(value)
+    )
+```
+
+## PROC FREQ
+```{r}
+# Create data
+survey_data <- data.frame(
+    gender = sample(c("M", "F"), 100, replace = TRUE),
+    satisfaction = sample(c("Low", "Medium", "High"), 100, replace = TRUE)
+)
+
+# SAS: PROC FREQ DATA=survey_data; TABLES gender satisfaction gender*satisfaction; RUN;
+
+# R:  One-way frequency
+table(survey_data$gender)
+prop.table(table(survey_data$gender))
+
+# Two-way cross-tabulation
+table(survey_data$gender, survey_data$satisfaction)
+prop.table(table(survey_data$gender, survey_data$satisfaction))
+
+# With dplyr
+survey_data %>%
+    count(gender, satisfaction) %>%
+    mutate(proportion = n / sum(n))
+```
+
+## PROC SORT
+```{r}
+# Create data
+unsorted <- data.frame(
+    id = c(3, 1, 4, 2, 5),
+    name = c("Charlie", "Alice", "David", "Bob", "Eve"),
+    score = c(85, 92, 78, 88, 95)
+)
+
+# SAS: PROC SORT DATA=unsorted OUT=sorted; BY score; RUN;
+
+# R (base)
+sorted_base <- unsorted[order(unsorted$score), ]
+sorted_desc <- unsorted[order(-unsorted$score), ]  # Descending
+
+# R (dplyr)
+sorted_dplyr <- unsorted %>% arrange(score)
+sorted_desc_dplyr <- unsorted %>% arrange(desc(score))
+
+print(sorted_dplyr)
+```
+
+::: 
+
+## Getting Help in R
+
+R has comprehensive built-in documentation and help systems. 
+
+### Basic Help Commands
+
+```{r}
+#| eval: false
+
+# Help on specific function
+? mean
+help(mean)
+
+# Search help for keyword
+?? regression
+help.search("regression")
+
+# Find functions with pattern in name
+apropos("mean")
+
+# Examples from help page
+example(mean)
+example(plot)
+
+# See function arguments
+args(mean)
+args(lm)
+
+# See function source code
+mean.default
+lm  # For most functions, just type the name
+```
+
+### Exploring Packages and Functions
+
+```{r}
+#| eval: false
+
+# List all installed packages
+installed.packages()
+
+# List functions in a package
+ls("package:dplyr")
+
+# Help on a package
+help(package = "dplyr")
+
+# Vignettes (package tutorials)
+vignette()                    # List all vignettes
+vignette("dplyr")             # Specific vignette
+browseVignettes("dplyr")      # Browse all package vignettes
+```
+
+### Online Resources and Cheat Sheets
+
+```{r}
+#| eval: false
+
+# R documentation website
+# https://www.rdocumentation.org/
+
+# RStudio cheat sheets
+# https://posit.co/resources/cheatsheets/
+
+# Stack Overflow for R questions
+# https://stackoverflow.com/questions/tagged/r
+
+# R-bloggers for tutorials
+# https://www.r-bloggers.com/
+```
+
+## Writing Custom Functions
+
+Creating reusable functions is essential for efficient R programming.
+
+### Basic Function Definition
+
+```{r}
+# Simple function
+calculate_bmi <- function(weight_kg, height_m) {
+    bmi <- weight_kg / (height_m^2)
+    return(bmi)
+}
+
+# Test function
+my_bmi <- calculate_bmi(70, 1.75)
+print(paste("BMI:", round(my_bmi, 2)))
+
+# Calculate for multiple people
+weights <- c(70, 85, 60)
+heights <- c(1.75, 1.80, 1.65)
+bmis <- mapply(calculate_bmi, weights, heights)
+print(round(bmis, 2))
+
+```
+### Function with Default Arguments
+```{r}
+# Function with default parameters
+greet_user <- function(name, greeting = "Hello") {
+    message <- paste(greeting, name)
+    return(message)
+}
+# Test function
+print(greet_user("Alice"))               # Uses default greeting
+print(greet_user("Bob", greeting = "Hi")) # Custom greeting
+```
+### Function with Variable Number of Arguments
+```{r}
+# Function that accepts variable number of arguments
+sum_numbers <- function(...) {
+    numbers <- c(...)
+    total <- sum(numbers, na.rm = TRUE)
+    return(total)
+}
+# Test function
+print(sum_numbers(1, 2, 3, 4, 5))
+print(sum_numbers(10, 20, NA, 30))
 ```

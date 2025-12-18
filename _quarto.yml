@@ -2,9 +2,9 @@ project:
   type: book
 
 book:
-  title: "sas2rnotes"
+  title: "R tutorial: Beginner to Expert"
   author: "Ram"
-  date: "18/12/2025"
+  date: today
   chapters:
     - index.qmd
     - part: "datatype & structure"
