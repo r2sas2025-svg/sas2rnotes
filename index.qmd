@@ -34,10 +34,11 @@ By the end of this course, you will be able to:
 
 ### Module 2: Data Import and Export
   - CSV, Excel and text files (`readr`, `readxl` packages)
-  - SAS dataset import (`haven` package) and export xpt files
+  - SAS data set import (`haven` package) and writ xpt files 
+  - Exporting data frames to various formats( rds,.RData)
   - other formats (JSON, XML)
   
-### Module 3: Data Manipulation - dplyr 
+### Module 3: Data Manipulation - dplyr and tidyr
 - **Core dplyr Functions**
   - `select()` vs `KEEP/DROP` statements
   - `filter()` vs `WHERE` clause
@@ -49,6 +50,7 @@ By the end of this course, you will be able to:
   - Joins equivalent to `PROC SQL` joins  
   - Reshaping data (`tidyr` vs `PROC TRANSPOSE`)
   - String manipulation (`stringr` vs SAS string functions)
+  - Date and time handling (`lubridate` vs SAS date functions)
   
 ### Module 4: Creation of ADSL dataset
 - **ADSL and ADVS Dataset Creation**
@@ -134,7 +136,6 @@ By the end of this course, you will be able to:
 ```{r eval=FALSE}
    install.packages(c("tidyverse", "haven", "readxl", "rmarkdown"))
 ```
-> Tip: If you don't have sample SDTM/ADaM data yet, the chapters generate **small synthetic data** as a fallback so everything runs end-to-end.
 ## contact
 For questions or feedback, reach out to **r2sas2025@gmail.com**
 

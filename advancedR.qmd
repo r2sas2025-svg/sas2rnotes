@@ -1,0 +1,1798 @@
+---
+title: "Advanced R Programming:  Functions, NSE, and Metaprogramming"
+---
+
+# Introduction {.unnumbered}
+
+Advanced R programming techniques are essential for creating flexible, powerful tools in pharmaceutical data analysis. This guide covers: 
+
+- **Function Types**:  Understanding different function paradigms in R
+- **Non-Standard Evaluation (NSE)**: How R evaluates expressions differently
+- **Quasiquotation and Quosures**: Modern tidy evaluation approaches
+- **Metaprogramming**: Code that writes or modifies code
+- **Base R Evaluation**:  Understanding R's evaluation model
+
+These concepts are crucial for: 
+
+- Building flexible analysis functions that work like `dplyr` verbs
+- Creating domain-specific languages (DSLs) for clinical data
+- Writing functions that accept column names without quotes
+- Developing packages for pharmaceutical programming
+
+```{r setup}
+#| message: false
+library(rlang)
+library(dplyr)
+library(tidyr)
+library(purrr)
+
+# Set options for better printing
+options(width = 80)
+```
+
+# Function Types in R
+
+R supports multiple programming paradigms, reflected in its diverse function types. 
+
+## 1. Regular Functions (Prefix Functions)
+
+Standard functions with arguments in parentheses. 
+
+```{r,eval=FALSE}
+# Basic function for dose calculation
+calculate_dose <- function(weight_kg, dose_per_kg = 5, max_dose = 400) {
+  dose <- weight_kg * dose_per_kg
+  
+  # Apply maximum dose cap
+  dose <- pmin(dose, max_dose)
+  
+  return(dose)
+}
+
+# Usage
+calculate_dose(70)
+calculate_dose(70, dose_per_kg = 10)
+calculate_dose(c(60, 75, 90), dose_per_kg = 8, max_dose = 500)
+```
+
+### Argument Matching
+
+R matches arguments by: 
+1. **Exact name match**
+2. **Partial name match**
+3. **Position**
+
+```{r,eval=FALSE}
+# Demonstrating argument matching
+dose_adjust <- function(baseline_dose, adjustment_factor, reason) {
+  adjusted <- baseline_dose * adjustment_factor
+  
+  cat("Dose adjustment:\n")
+  cat("  Original:", baseline_dose, "mg\n")
+  cat("  Factor:", adjustment_factor, "\n")
+  cat("  New dose:", adjusted, "mg\n")
+  cat("  Reason:", reason, "\n")
+  
+  return(adjusted)
+}
+
+# Position matching
+dose_adjust(100, 0.75, "Renal impairment")
+
+# Name matching (any order)
+dose_adjust(
+  adjustment_factor = 0.5,
+  reason = "Hepatic impairment",
+  baseline_dose = 200
+)
+
+# Partial matching (not recommended but works)
+dose_adjust(base = 150, adj = 1.25, rea = "Efficacy")
+```
+
+### The ...  (Dot-Dot-Dot) Argument
+
+Allows passing arbitrary arguments to other functions.
+
+```{r,eval=FALSE}
+# Wrapper function for summary statistics
+summarize_lab_values <- function(data, variable, ...) {
+  # ... passes additional arguments to summary()
+  cat("Summary of", variable, ":\n")
+  summary_stats <- summary(data[[variable]], ...)
+  print(summary_stats)
+  
+  return(invisible(summary_stats))
+}
+
+# Example data
+lab_data <- data.frame(
+  subject_id = 1:10,
+  alt = c(25, 32, NA, 45, 38, 52, NA, 41, 35, 48),
+  creatinine = c(0.9, 1.1, 1.0, 1.3, 0.8, 1.2, 1.0, 1.1, 0.9, 1.0)
+)
+
+# Without na.rm
+summarize_lab_values(lab_data, "alt")
+
+# With na.rm passed through ... 
+summarize_lab_values(lab_data, "alt", na.rm = TRUE)
+```
+
+### Capturing ...  Arguments
+
+```{r,eval=FALSE}
+# Function that captures and processes ...  arguments
+create_analysis_note <- function(study_id, analyst, ...) {
+  # Capture additional notes
+  notes <- list(...)
+  
+  report <- paste0(
+    "Study: ", study_id, "\n",
+    "Analyst: ", analyst, "\n",
+    "Additional Notes:\n"
+  )
+  
+  if (length(notes) > 0) {
+    for (name in names(notes)) {
+      report <- paste0(report, "  ", name, ": ", notes[[name]], "\n")
+    }
+  }
+  
+  cat(report)
+  return(invisible(notes))
+}
+
+# Usage
+create_analysis_note(
+  study_id = "PROTO-123",
+  analyst = "Jane Doe",
+  date = "2025-12-18",
+  software = "R 4.3.0",
+  note = "ITT population analysis"
+)
+```
+
+## 2. Infix Functions
+
+Functions called between arguments (e.g., `+`, `-`, `%>%`).
+
+### Built-in Infix Operators
+
+```{r,eval=FALSE}
+# Arithmetic
+5 + 3
+10 - 2
+4 * 6
+20 / 5
+2 ^ 8
+10 %% 3  # Modulo
+10 %/% 3 # Integer division
+
+# Comparison
+5 > 3
+5 >= 5
+5 == 5
+5 != 3
+
+# Logical
+TRUE & FALSE
+TRUE | FALSE
+! TRUE
+
+# Special
+5 %in% c(1, 3, 5, 7)
+```
+
+### Creating Custom Infix Functions
+
+Custom infix functions must be surrounded by `%`.
+
+```{r,eval=FALSE}
+# Custom infix operator for dose within range check
+`%between%` <- function(dose, range) {
+  dose >= range[1] & dose <= range[2]
+}
+
+# Usage in dose validation
+prescribed_dose <- 150
+therapeutic_range <- c(100, 200)
+
+prescribed_dose %between% therapeutic_range
+
+# Multiple doses
+doses <- c(75, 125, 175, 225)
+doses %between% therapeutic_range
+```
+
+```{r,eval=FALSE}
+# Infix operator for concatenating with separator
+`%+%` <- function(x, y) {
+  paste(x, y, sep = " - ")
+}
+
+# Creating subject identifiers
+"STUDY001" %+% "SITE01" %+% "SUBJ001"
+
+# Creating treatment labels
+treatment <- "Xanomeline"
+dose <- "10mg"
+frequency <- "QD"
+
+treatment %+% dose %+% frequency
+```
+
+```{r,eval=FALSE}
+# Practical pharmaceutical example: NA replacement
+`%||%` <- function(x, y) {
+  if (is.na(x) || is.null(x)) y else x
+}
+
+# Handling missing lab values with LLOQ
+lab_value <- NA
+lloq <- 0.1
+
+imputed_value <- lab_value %||% lloq
+imputed_value
+
+# With actual value
+lab_value <- 2.5
+imputed_value <- lab_value %||% lloq
+imputed_value
+```
+
+## 3. Replacement Functions
+
+Functions that modify objects in place using `<-` syntax.
+
+### Built-in Replacement Functions
+
+```{r,eval=FALSE}
+# Vector replacement
+x <- 1:10
+x[5] <- 999
+x
+
+# Names replacement
+patient_data <- c(75, 82, 68)
+names(patient_data) <- c("Weight", "Height", "Age")
+patient_data
+
+# Column replacement
+df <- data.frame(a = 1:3, b = 4:6)
+df$c <- 7:9
+df
+```
+
+### Creating Custom Replacement Functions
+
+Replacement functions must: 
+1. Have name ending in `<-`
+2. Have `value` as the last parameter
+3. Return the modified object
+
+```{r,eval=FALSE}
+# Custom replacement function for dose adjustment
+`dose<-` <- function(x, adjustment_type, value) {
+  if (adjustment_type == "multiply") {
+    x$adjusted_dose <- x$baseline_dose * value
+  } else if (adjustment_type == "add") {
+    x$adjusted_dose <- x$baseline_dose + value
+  } else if (adjustment_type == "set") {
+    x$adjusted_dose <- value
+  }
+  
+  return(x)
+}
+
+# Create patient dosing data
+dosing <- data.frame(
+  subject_id = c("001", "002", "003"),
+  baseline_dose = c(100, 150, 200)
+)
+
+# Use replacement function
+dose(dosing, "multiply") <- 0.75
+dosing
+
+dose(dosing, "add") <- 50
+dosing
+
+dose(dosing, "set") <- 100
+dosing
+```
+
+```{r,eval=FALSE}
+# Practical example: Setting drug concentration units
+`conc_unit<-` <- function(x, value) {
+  attr(x, "unit") <- value
+  class(x) <- c("concentration", class(x))
+  return(x)
+}
+
+# Method to print with units
+print.concentration <- function(x, ...) {
+  unit <- attr(x, "unit")
+  if (! is.null(unit)) {
+    cat("Drug concentrations (", unit, "):\n", sep = "")
+  }
+  print(unclass(x))
+  invisible(x)
+}
+
+# Usage
+concentrations <- c(25.5, 32.1, 28.7, 35.2)
+conc_unit(concentrations) <- "ng/mL"
+concentrations
+```
+
+## 4. Anonymous Functions (Lambdas)
+
+Functions without names, often used with `apply` family or `purrr`.
+
+### Traditional Anonymous Functions
+
+```{r,eval=FALSE}
+# Calculate BMI for list of patients
+patients <- list(
+  list(weight = 70, height = 1.75),
+  list(weight = 85, height = 1.82),
+  list(weight = 62, height = 1.68)
+)
+
+# Using anonymous function with lapply
+bmis <- lapply(patients, function(p) {
+  p$weight / (p$height ^ 2)
+})
+
+unlist(bmis)
+```
+
+### Formula Syntax (purrr style)
+
+```{r,eval=FALSE}
+library(purrr)
+
+# Same calculation with formula syntax
+bmis <- map_dbl(patients, ~ .x$weight / (. x$height ^ 2))
+bmis
+
+# With pipe
+patients %>%
+  map_dbl(~ .x$weight / (.x$height ^ 2)) %>%
+  round(1)
+```
+
+### New R 4.1+ Anonymous Function Syntax
+
+```{r,eval=FALSE}
+# Using \() syntax (R >= 4.1)
+bmis <- sapply(patients, \(p) p$weight / (p$height ^ 2))
+bmis
+
+# More complex example:  dose escalation
+dose_levels <- c(10, 25, 50, 100, 200)
+
+# Calculate safety margin for each dose
+safety_margins <- sapply(dose_levels, \(dose) {
+  mtd <- 250  # Maximum tolerated dose
+  margin <- (mtd - dose) / mtd * 100
+  return(margin)
+})
+
+data.frame(
+  dose = dose_levels,
+  safety_margin_pct = round(safety_margins, 1)
+)
+```
+
+## 5. Higher-Order Functions
+
+Functions that take functions as arguments or return functions.
+
+### Functions That Take Functions
+
+```{r,eval=FALSE}
+# Apply transformation to lab values
+transform_lab_values <- function(data, variable, transform_fn) {
+  data[[paste0(variable, "_transformed")]] <- transform_fn(data[[variable]])
+  return(data)
+}
+
+# Example data
+lab_values <- data.frame(
+  subject_id = 1:5,
+  alt = c(25, 150, 45, 200, 38)
+)
+
+# Log transformation
+lab_values <- transform_lab_values(
+  lab_values, 
+  "alt", 
+  function(x) log(x)
+)
+
+# Square root transformation
+lab_values <- transform_lab_values(
+  lab_values, 
+  "alt", 
+  sqrt
+)
+
+lab_values
+```
+
+### Functions That Return Functions (Function Factories)
+
+```{r,eval=FALSE}
+# Factory for creating dose calculation functions
+create_dose_calculator <- function(dose_per_kg, max_dose = Inf) {
+  function(weight_kg) {
+    dose <- weight_kg * dose_per_kg
+    pmin(dose, max_dose)
+  }
+}
+
+# Create specific calculators
+calc_standard_dose <- create_dose_calculator(5, max_dose = 400)
+calc_loading_dose <- create_dose_calculator(10, max_dose = 600)
+calc_pediatric_dose <- create_dose_calculator(3, max_dose = 200)
+
+# Use them
+patient_weight <- 75
+
+calc_standard_dose(patient_weight)
+calc_loading_dose(patient_weight)
+calc_pediatric_dose(patient_weight)
+```
+
+```{r,eval=FALSE}
+# Factory for creating reference range checkers
+create_range_checker <- function(lower, upper, unit = "") {
+  function(value) {
+    in_range <- value >= lower & value <= upper
+    status <- ifelse(in_range, "Normal", 
+                    ifelse(value < lower, "Low", "High"))
+    
+    list(
+      value = value,
+      status = status,
+      reference = paste0(lower, "-", upper, " ", unit)
+    )
+  }
+}
+
+# Create specific checkers
+check_creatinine <- create_range_checker(0.6, 1.2, "mg/dL")
+check_alt <- create_range_checker(7, 56, "U/L")
+check_hemoglobin <- create_range_checker(12, 16, "g/dL")
+
+# Use them
+check_creatinine(1.5)
+check_alt(45)
+check_hemoglobin(11.5)
+```
+
+## 6. Primitive Functions
+
+Low-level functions implemented in C. 
+
+```{r,eval=FALSE}
+# Primitive functions have no R code
+typeof(sum)
+typeof(`+`)
+typeof(`if`)
+
+# Compare to regular function
+typeof(mean)
+
+# View primitive
+`+`
+
+# Primitives are fast but inflexible
+x <- 1:1000000
+
+# Primitive
+system.time(sum(x))
+
+# R implementation would be slower
+sum_r <- function(x) {
+  total <- 0
+  for (i in x) total <- total + i
+  total
+}
+
+system.time(sum_r(x))
+```
+
+# Non-Standard Evaluation (NSE)
+
+Non-standard evaluation allows R to capture and manipulate expressions before evaluating them.
+
+## Standard vs Non-Standard Evaluation
+
+### Standard Evaluation
+
+```{r,eval=FALSE}
+# Standard evaluation:  evaluate then pass
+patient_data <- data.frame(
+  subject_id = 1:5,
+  age = c(45, 52, 38, 61, 44),
+  weight = c(75, 82, 68, 90, 73)
+)
+
+# Standard:  column accessed by string or $
+calculate_mean_standard <- function(data, column_name) {
+  mean(data[[column_name]], na.rm = TRUE)
+}
+
+calculate_mean_standard(patient_data, "age")
+calculate_mean_standard(patient_data, "weight")
+```
+
+### Non-Standard Evaluation
+
+```{r,eval=FALSE}
+# Non-standard: capture expression, don't evaluate immediately
+calculate_mean_nse <- function(data, column) {
+  # Capture the expression
+  col_expr <- substitute(column)
+  
+  # Evaluate in the context of data
+  col_values <- eval(col_expr, envir = data)
+  
+  mean(col_values, na.rm = TRUE)
+}
+
+# Can use column name without quotes! 
+calculate_mean_nse(patient_data, age)
+calculate_mean_nse(patient_data, weight)
+```
+
+## Base R NSE Functions
+
+### substitute()
+
+Captures an expression without evaluating it.
+
+```{r,eval=FALSE}
+# substitute() captures the expression
+demo_substitute <- function(x) {
+  cat("Expression passed:", deparse(substitute(x)), "\n")
+  cat("Value:", x, "\n")
+}
+
+my_var <- 42
+demo_substitute(my_var)
+demo_substitute(10 + 20)
+demo_substitute(sqrt(100))
+```
+
+### quote()
+
+Similar to `substitute()` but doesn't do substitution.
+
+```{r,eval=FALSE}
+# quote() captures expression literally
+expr1 <- quote(x + y)
+expr1
+
+# Can manipulate the expression
+expr1[[1]]  # The function (+)
+expr1[[2]]  # First argument (x)
+expr1[[3]]  # Second argument (y)
+
+# Modify expression
+expr1[[3]] <- quote(z)
+expr1
+```
+
+### eval()
+
+Evaluates an expression in an environment.
+
+```{r,eval=FALSE}
+# Create expression
+expr <- quote(weight / (height ^ 2))
+
+# Create environment with variables
+patient <- list(weight = 75, height = 1.75)
+
+# Evaluate expression in that environment
+eval(expr, envir = patient)
+
+# Different patient
+patient2 <- list(weight = 85, height = 1.82)
+eval(expr, envir = patient2)
+```
+
+### Practical NSE Example:  Custom Summary Function
+
+```{r,eval=FALSE}
+# Summary function with NSE for nice output
+summarize_variable <- function(data, variable, by = NULL) {
+  # Capture expressions
+  var_expr <- substitute(variable)
+  by_expr <- substitute(by)
+  
+  var_name <- deparse(var_expr)
+  
+  if (is.null(by_expr)) {
+    # Overall summary
+    values <- eval(var_expr, envir = data)
+    
+    cat("Summary of", var_name, ":\n")
+    cat("  N:", length(na.omit(values)), "\n")
+    cat("  Mean:", round(mean(values, na.rm = TRUE), 2), "\n")
+    cat("  SD:", round(sd(values, na.rm = TRUE), 2), "\n")
+    cat("  Median:", round(median(values, na.rm = TRUE), 2), "\n")
+    cat("  Range:", paste(range(values, na.rm = TRUE), collapse = "-"), "\n")
+  } else {
+    # By group summary
+    by_name <- deparse(by_expr)
+    groups <- eval(by_expr, envir = data)
+    values <- eval(var_expr, envir = data)
+    
+    cat("Summary of", var_name, "by", by_name, ":\n")
+    
+    for (group in unique(groups)) {
+      group_values <- values[groups == group]
+      cat("\n", group, ":\n", sep = "")
+      cat("  N:", length(na.omit(group_values)), "\n")
+      cat("  Mean:", round(mean(group_values, na.rm = TRUE), 2), "\n")
+      cat("  SD:", round(sd(group_values, na.rm = TRUE), 2), "\n")
+    }
+  }
+}
+
+# Create clinical data
+clinical_data <- data.frame(
+  subject_id = 1:12,
+  treatment = rep(c("Placebo", "Drug 50mg", "Drug 100mg"), each = 4),
+  systolic_bp = c(145, 142, 148, 140, 138, 135, 132, 136, 130, 128, 125, 132),
+  age = c(45, 52, 48, 55, 44, 50, 53, 47, 49, 51, 46, 54)
+)
+
+# Usage without quotes! 
+summarize_variable(clinical_data, systolic_bp)
+summarize_variable(clinical_data, systolic_bp, by = treatment)
+```
+
+## Problems with Base R NSE
+
+### Issue 1: Doesn't Work with Variables
+
+```{r,eval=FALSE}
+# This works
+summarize_variable(clinical_data, age)
+
+# This doesn't work as expected
+my_column <- "age"
+# summarize_variable(clinical_data, my_column)  # Error or wrong result
+```
+
+### Issue 2: Difficult to Program With
+
+```{r,eval=FALSE}
+# Hard to use NSE functions inside other functions
+analyze_columns <- function(data, cols) {
+  # How do we pass cols to summarize_variable?
+  # for (col in cols) {
+  #   summarize_variable(data, col)  # Won't work! 
+  # }
+}
+```
+
+This is why tidy evaluation was developed!
+
+# Tidy Evaluation (Modern NSE)
+
+Tidy evaluation (tidy eval) is a modern framework for NSE that solves the problems with base R NSE. 
+
+## Core Concepts
+
+### Quoting and Unquoting
+
+```{r,eval=FALSE}
+library(rlang)
+
+# enquo() captures expression as quosure
+summarize_tidy <- function(data, variable) {
+  var_quo <- enquo(variable)
+  
+  # !! unquotes the quosure
+  data %>%
+    summarise(
+      n = n(),
+      mean = mean(!! var_quo, na.rm = TRUE),
+      sd = sd(!!var_quo, na.rm = TRUE)
+    )
+}
+
+# Works with bare names
+summarize_tidy(clinical_data, age)
+summarize_tidy(clinical_data, systolic_bp)
+```
+
+### Quosures
+
+Quosures = quote + closure (expression + environment)
+
+```{r,eval=FALSE}
+# Create a quosure
+my_quo <- quo(weight / (height ^ 2))
+my_quo
+
+# Quosure contains expression and environment
+get_expr(my_quo)
+get_env(my_quo)
+
+# Can evaluate quosure
+patient_env <- env(weight = 75, height = 1.75)
+eval_tidy(my_quo, data = patient_env)
+```
+
+## Tidy Evaluation Operators
+
+### The Bang-Bang (!!)
+
+Unquotes a single expression.
+
+```{r,eval=FALSE}
+# Function using !!
+filter_by_threshold <- function(data, variable, threshold) {
+  var_quo <- enquo(variable)
+  
+  data %>%
+    filter(!! var_quo > threshold)
+}
+
+# Usage
+filter_by_threshold(clinical_data, systolic_bp, 135)
+filter_by_threshold(clinical_data, age, 50)
+```
+
+### The Big Bang (!!!)
+
+Unquotes multiple expressions (splice).
+
+```{r,eval=FALSE}
+# Function that accepts multiple grouping variables
+group_summarize <- function(data, ...) {
+  group_vars <- enquos(...)
+  
+  data %>%
+    group_by(!!! group_vars) %>%
+    summarise(
+      n = n(),
+      mean_sbp = mean(systolic_bp, na.rm = TRUE),
+      .groups = "drop"
+    )
+}
+
+# Can group by multiple variables
+group_summarize(clinical_data, treatment)
+
+# Add more clinical data for better example
+clinical_data2 <- clinical_data %>%
+  mutate(
+    sex = rep(c("M", "F"), length.out = n()),
+    age_group = ifelse(age < 50, "<50", ">=50")
+  )
+
+group_summarize(clinical_data2, treatment, sex)
+group_summarize(clinical_data2, treatment, age_group)
+```
+
+### The Walrus := 
+
+Creates named outputs programmatically.
+
+```{r,eval=FALSE}
+# Function that creates named output
+summarize_with_name <- function(data, variable, suffix = "mean") {
+  var_quo <- enquo(variable)
+  var_name <- as_name(var_quo)
+  
+  # Create name programmatically
+  output_name <- paste0(var_name, "_", suffix)
+  
+  data %>%
+    summarise(
+      !!output_name := mean(!! var_quo, na.rm = TRUE)
+    )
+}
+
+summarize_with_name(clinical_data, systolic_bp, "average")
+summarize_with_name(clinical_data, age, "mean")
+```
+
+### The Curly-Curly {{}}
+
+Shortcut for `enquo()` + `!!`. Most commonly used.
+
+```{r,eval=FALSE}
+# Using {{ }} (embrace operator)
+summarize_by_group <- function(data, group_var, summary_var) {
+  data %>%
+    group_by({{ group_var }}) %>%
+    summarise(
+      n = n(),
+      mean = mean({{ summary_var }}, na.rm = TRUE),
+      sd = sd({{ summary_var }}, na.rm = TRUE),
+      median = median({{ summary_var }}, na.rm = TRUE),
+      .groups = "drop"
+    )
+}
+
+# Clean, simple usage
+summarize_by_group(clinical_data, treatment, systolic_bp)
+summarize_by_group(clinical_data2, sex, age)
+```
+
+## Comprehensive Tidy Eval Example
+
+```{r,eval=FALSE}
+# Flexible adverse event summary function
+summarize_ae_tidy <- function(data, 
+                              ae_var, 
+                              treat_var, 
+                              subj_var = subject_id,
+                              ...) {
+  # Capture expressions
+  ae_quo <- enquo(ae_var)
+  treat_quo <- enquo(treat_var)
+  subj_quo <- enquo(subj_var)
+  additional_groups <- enquos(...)
+  
+  # Get N per treatment
+  n_per_treat <- data %>%
+    group_by({{ treat_var }}) %>%
+    summarise(N = n_distinct({{ subj_var }}), .groups = "drop")
+  
+  # Count AEs
+  ae_summary <- data %>%
+    group_by({{ treat_var }}, {{ ae_var }}, !!! additional_groups) %>%
+    summarise(
+      n = n_distinct({{ subj_var }}),
+      events = n(),
+      .groups = "drop"
+    ) %>%
+    left_join(n_per_treat, by = as_name(treat_quo)) %>%
+    mutate(
+      pct = round(n / N * 100, 1),
+      display = paste0(n, " (", pct, "%)")
+    ) %>%
+    arrange(desc(n))
+  
+  return(ae_summary)
+}
+
+# Example AE data
+ae_data <- data.frame(
+  subject_id = c(1, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8),
+  treatment = rep(c("Placebo", "Drug 50mg", "Drug 100mg"), length.out = 11),
+  ae_term = c("Headache", "Nausea", "Headache", "Fatigue", "Nausea",
+              "Headache", "Dizziness", "Headache", "Nausea", "Fatigue", "Headache"),
+  severity = c("Mild", "Moderate", "Mild", "Mild", "Severe",
+               "Mild", "Mild", "Moderate", "Mild", "Moderate", "Mild")
+)
+
+# Use with different groupings
+summarize_ae_tidy(ae_data, ae_term, treatment)
+summarize_ae_tidy(ae_data, ae_term, treatment, severity)
+```
+
+## Working with Character Vectors (Data Masking)
+
+```{r,eval=FALSE}
+# Using . data pronoun for computed column names
+summarize_columns <- function(data, col_names) {
+  results <- list()
+  
+  for (col in col_names) {
+    results[[col]] <- data %>%
+      summarise(
+        mean = mean(.data[[col]], na.rm = TRUE),
+        sd = sd(.data[[col]], na.rm = TRUE)
+      )
+  }
+  
+  bind_rows(results, .id = "variable")
+}
+
+# Usage with character vector
+cols_to_analyze <- c("age", "systolic_bp")
+summarize_columns(clinical_data, cols_to_analyze)
+```
+
+```{r,eval=FALSE}
+# More complex example with dynamic column selection
+create_summary_table <- function(data, group_col, value_cols) {
+  # Use across() with all_of()
+  data %>%
+    group_by(.data[[group_col]]) %>%
+    summarise(
+      across(
+        all_of(value_cols),
+        list(
+          mean = ~mean(.x, na.rm = TRUE),
+          sd = ~sd(.x, na.rm = TRUE)
+        ),
+        .names = "{.col}_{.fn}"
+      ),
+      n = n(),
+      .groups = "drop"
+    )
+}
+
+# Usage
+create_summary_table(
+  clinical_data, 
+  group_col = "treatment",
+  value_cols = c("age", "systolic_bp")
+)
+```
+
+# Metaprogramming
+
+Metaprogramming means writing code that generates or modifies code.
+
+## Inspecting and Modifying Expressions
+
+### Expression Structure
+
+```{r,eval=FALSE}
+# Expressions are trees
+expr <- expr(filter(data, age > 50, treatment == "Drug"))
+
+# View structure
+lobstr::ast(filter(data, age > 50, treatment == "Drug"))
+
+# Access components
+expr[[1]]  # Function name
+expr[[2]]  # First argument
+expr[[3]]  # Second argument
+expr[[4]]  # Third argument
+```
+
+### Modifying Expressions
+
+```{r,eval=FALSE}
+# Build expression programmatically
+build_filter_expr <- function(data_name, filters) {
+  # Start with data
+  call_expr <- expr(!! sym(data_name))
+  
+  # Build filter call
+  filter_args <- map(filters, parse_expr)
+  
+  result_expr <- expr(filter(!!call_expr, !!! filter_args))
+  
+  return(result_expr)
+}
+
+# Create filter expression
+my_filters <- c("age > 50", "systolic_bp < 140")
+filter_expr <- build_filter_expr("clinical_data", my_filters)
+filter_expr
+
+# Evaluate it
+eval(filter_expr)
+```
+
+## Building Function Calls
+
+### Using call2()
+
+```{r,eval=FALSE}
+# Build calls dynamically
+build_call <- function(fn_name, ...) {
+  call2(fn_name, ...)
+}
+
+# Build mean call
+mean_call <- build_call("mean", expr(x), na.rm = TRUE)
+mean_call
+
+# Evaluate with data
+x <- c(1, 2, 3, NA, 5)
+eval(mean_call)
+```
+
+### Pharmaceutical Example:  Dynamic Analysis Builder
+
+```{r,eval=FALSE}
+# Build analysis specification programmatically
+build_analysis_spec <- function(dataset, 
+                                endpoint, 
+                                treatment_var,
+                                covariates = NULL,
+                                test_type = "t. test") {
+  
+  # Build formula
+  if (is.null(covariates)) {
+    formula_str <- paste(endpoint, "~", treatment_var)
+  } else {
+    formula_str <- paste(endpoint, "~", treatment_var, "+", 
+                        paste(covariates, collapse = " + "))
+  }
+  
+  formula_obj <- as.formula(formula_str)
+  
+  # Build test call
+  test_call <- call2(
+    test_type,
+    formula_obj,
+    data = sym(dataset)
+  )
+  
+  # Return specification
+  list(
+    formula = formula_obj,
+    test_call = test_call,
+    description = paste("Testing", endpoint, "by", treatment_var)
+  )
+}
+
+# Create analysis specification
+spec <- build_analysis_spec(
+  dataset = "clinical_data",
+  endpoint = "systolic_bp",
+  treatment_var = "treatment",
+  covariates = c("age", "sex"),
+  test_type = "lm"
+)
+
+spec$formula
+spec$test_call
+spec$description
+
+# Could evaluate the call
+# eval(spec$test_call)
+```
+
+## Creating Domain-Specific Languages (DSLs)
+
+### Example: Clinical Data Validation DSL
+
+```{r,eval=FALSE}
+# DSL for data validation rules
+validation_rule <- function(rule_name, condition, message) {
+  structure(
+    list(
+      name = rule_name,
+      condition = enexpr(condition),
+      message = message
+    ),
+    class = "validation_rule"
+  )
+}
+
+# Apply validation rules
+validate_data <- function(data, ...) {
+  rules <- list(...)
+  results <- list()
+  
+  for (i in seq_along(rules)) {
+    rule <- rules[[i]]
+    
+    # Evaluate condition
+    passed <- eval_tidy(rule$condition, data = data)
+    
+    results[[rule$name]] <- list(
+      name = rule$name,
+      passed = all(passed, na.rm = TRUE),
+      n_failed = sum(! passed, na.rm = TRUE),
+      message = rule$message
+    )
+  }
+  
+  structure(results, class = "validation_results")
+}
+
+# Print method
+print.validation_results <- function(x, ...) {
+  cat("Validation Results:\n")
+  cat(strrep("=", 50), "\n")
+  
+  for (result in x) {
+    status <- if (result$passed) "✓ PASS" else "✗ FAIL"
+    cat(sprintf("%s: %s\n", status, result$name))
+    
+    if (! result$passed) {
+      cat(sprintf("  Failed: %d records\n", result$n_failed))
+      cat(sprintf("  Message: %s\n", result$message))
+    }
+  }
+  
+  invisible(x)
+}
+
+# Define validation rules
+results <- validate_data(
+  clinical_data,
+  
+  validation_rule(
+    "age_range",
+    age >= 18 & age <= 100,
+    "Age must be between 18 and 100"
+  ),
+  
+  validation_rule(
+    "bp_range",
+    systolic_bp >= 80 & systolic_bp <= 200,
+    "Systolic BP must be between 80 and 200"
+  ),
+  
+  validation_rule(
+    "treatment_valid",
+    treatment %in% c("Placebo", "Drug 50mg", "Drug 100mg"),
+    "Treatment must be valid"
+  )
+)
+
+results
+```
+
+## Code Generation
+
+### Generating Multiple Functions
+
+```{r,eval=FALSE}
+# Generate summary functions for different statistics
+create_stat_function <- function(stat_name, stat_fn) {
+  fn <- new_function(
+    args = pairlist(data = , variable = ),
+    body = expr({
+      var_quo <- enquo(variable)
+      data %>%
+        summarise(
+          !!stat_name := !!stat_fn(!!var_quo, na.rm = TRUE)
+        )
+    }),
+    env = caller_env()
+  )
+  
+  return(fn)
+}
+
+# Create functions
+calc_mean <- create_stat_function("mean", quote(mean))
+calc_median <- create_stat_function("median", quote(median))
+calc_sd <- create_stat_function("sd", quote(sd))
+
+# Use generated functions
+calc_mean(clinical_data, age)
+calc_median(clinical_data, systolic_bp)
+calc_sd(clinical_data, age)
+```
+
+# Base R Evaluation Functions in Detail
+
+## Evaluation Contexts
+
+R has multiple evaluation contexts:
+
+1. **Global environment**: Interactive R session
+2. **Function environment**: Inside function calls
+3. **Package namespace**: Package internal environment
+4. **Data frames**: Using `with()`, `subset()`, etc.
+
+## Core Evaluation Functions
+
+### eval()
+
+Evaluates an expression in a specified environment.
+
+```{r,eval=FALSE}
+# Basic eval
+expr <- quote(a + b)
+a <- 10
+b <- 20
+eval(expr)
+
+# Eval in specific environment
+custom_env <- new.env()
+custom_env$a <- 100
+custom_env$b <- 200
+eval(expr, envir = custom_env)
+
+# Eval with data frame
+patient_df <- data.frame(
+  weight = 75,
+  height = 1.75
+)
+
+bmi_expr <- quote(weight / (height^2))
+eval(bmi_expr, envir = patient_df)
+```
+
+### evalq()
+
+Evaluates a quoted expression (quote + eval combined).
+
+```{r,eval=FALSE}
+# evalq quotes and evaluates
+a <- 5
+b <- 10
+
+# With eval, need to quote
+eval(quote(a + b))
+
+# With evalq, automatic quoting
+evalq(a + b)
+
+# Useful in data frames
+patient_df <- data.frame(
+  dose = c(100, 150, 200),
+  weight = c(60, 75, 90)
+)
+
+# Calculate dose per kg
+evalq(dose / weight, envir = patient_df)
+```
+
+### with() and within()
+
+Evaluate expressions in the context of a data frame or list.
+
+```{r,eval=FALSE}
+# with() evaluates and returns result
+patient_data <- data.frame(
+  subject_id = 1:5,
+  weight = c(60, 75, 80, 65, 90),
+  height = c(1.68, 1.75, 1.82, 1.70, 1.85),
+  dose = c(300, 375, 400, 325, 450)
+)
+
+# Calculate without with()
+patient_data$weight / (patient_data$height ^ 2)
+
+# Calculate with with() - cleaner
+with(patient_data, weight / (height ^ 2))
+
+# Multiple calculations
+with(patient_data, {
+  bmi <- weight / (height ^ 2)
+  dose_per_kg <- dose / weight
+  
+  data.frame(
+    subject_id = subject_id,
+    bmi = round(bmi, 1),
+    dose_per_kg = round(dose_per_kg, 1)
+  )
+})
+```
+
+```{r,eval=FALSE}
+# within() modifies and returns the data frame
+patient_data <- within(patient_data, {
+  bmi <- weight / (height ^ 2)
+  dose_per_kg <- dose / weight
+  bmi_category <- cut(
+    bmi, 
+    breaks = c(0, 18.5, 25, 30, Inf),
+    labels = c("Underweight", "Normal", "Overweight", "Obese")
+  )
+})
+
+patient_data
+```
+
+### do.call()
+
+Calls a function with arguments from a list.
+
+```{r,eval=FALSE}
+# Basic do.call
+args_list <- list(x = c(1, 2, 3, NA, 5), na.rm = TRUE)
+do.call(mean, args_list)
+
+# Useful for programmatic function calls
+run_test <- function(test_name, ...) {
+  args <- list(...)
+  do.call(test_name, args)
+}
+
+# Perform t-test programmatically
+group1 <- c(120, 125, 130, 122, 128)
+group2 <- c(135, 140, 138, 142, 136)
+
+run_test("t.test", x = group1, y = group2)
+```
+
+```{r,eval=FALSE}
+# Practical example: Dynamic column binding
+create_analysis_dataset <- function(... ) {
+  # Capture data frames
+  datasets <- list(...)
+  
+  # Combine all data frames
+  do.call(cbind, datasets)
+}
+
+# Create separate datasets
+demographics <- data.frame(
+  subject_id = 1:5,
+  age = c(45, 52, 48, 55, 44)
+)
+
+vitals <- data.frame(
+  sbp = c(120, 135, 128, 142, 125),
+  dbp = c(80, 85, 82, 90, 78)
+)
+
+labs <- data.frame(
+  alt = c(25, 32, 28, 45, 30),
+  creatinine = c(0.9, 1.1, 1.0, 1.3, 0.95)
+)
+
+# Combine programmatically
+combined <- create_analysis_dataset(demographics, vitals, labs)
+combined
+```
+
+### match.call()
+
+Captures the actual function call as an expression.
+
+```{r,eval=FALSE}
+# Capture function call for logging
+logged_analysis <- function(data, formula, method = "lm", ...) {
+  # Capture the call
+  call_expr <- match.call()
+  
+  cat("Analysis Call:\n")
+  print(call_expr)
+  cat("\n")
+  
+  # Perform analysis
+  result <- do.call(method, list(formula = formula, data = data, ...))
+  
+  # Add call to result
+  result$call_captured <- call_expr
+  
+  return(result)
+}
+
+# Use it
+model <- logged_analysis(
+  data = clinical_data,
+  formula = systolic_bp ~ age + treatment,
+  method = "lm"
+)
+
+# Can see exactly what was called
+model$call_captured
+```
+
+### sys.call(), sys.frame(), parent.frame()
+
+Access the call stack for debugging and metaprogramming.
+
+```{r,eval=FALSE}
+# Function that inspects call stack
+debug_function <- function(x) {
+  cat("Current call:\n")
+  print(sys.call())
+  
+  cat("\nParent call:\n")
+  print(sys.call(-1))
+  
+  cat("\nAll calls:\n")
+  print(sys.calls())
+  
+  return(x * 2)
+}
+
+wrapper_function <- function(x) {
+  debug_function(x)
+}
+
+# See call stack
+wrapper_function(10)
+```
+
+```{r,eval=FALSE}
+# Practical use:  Get calling function's environment
+get_caller_data <- function(var_name) {
+  # Get parent frame (caller's environment)
+  caller_env <- parent.frame()
+  
+  # Try to get variable from caller
+  if (exists(var_name, envir = caller_env)) {
+    return(get(var_name, envir = caller_env))
+  } else {
+    stop(paste("Variable", var_name, "not found in calling environment"))
+  }
+}
+
+demo_caller <- function() {
+  local_data <- data.frame(x = 1:5, y = 6:10)
+  
+  # get_caller_data can access local_data
+  result <- get_caller_data("local_data")
+  return(result)
+}
+
+demo_caller()
+```
+
+## Environments in Depth
+
+### Creating and Managing Environments
+
+```{r,eval=FALSE}
+# Create new environment
+my_env <- new.env()
+
+# Add variables
+my_env$patient_count <- 100
+my_env$study_id <- "PROTO-123"
+my_env$calculate_dose <- function(weight) weight * 5
+
+# List contents
+ls(my_env)
+
+# Access
+my_env$patient_count
+my_env$calculate_dose(70)
+
+# Check existence
+exists("patient_count", envir = my_env)
+exists("nonexistent", envir = my_env)
+```
+
+### Environment Hierarchy
+
+```{r,eval=FALSE}
+# Environments have parents
+my_env <- new.env()
+parent.env(my_env)  # Global environment
+
+# Search path
+search()
+
+# Variable lookup follows environment chain
+x <- "global"
+
+my_env <- new.env()
+my_env$x <- "my_env"
+
+inner_env <- new.env(parent = my_env)
+inner_env$y <- "inner"
+
+# Look up x from inner_env
+evalq(x, envir = inner_env)  # Finds "my_env" from parent
+
+# Look up y
+evalq(y, envir = inner_env)  # Finds "inner" locally
+```
+
+### Practical Environment Use:  Caching
+
+```{r,eval=FALSE}
+# Use environment for memoization (caching)
+create_memoized_function <- function(fn) {
+  cache <- new.env()
+  
+  function(... ) {
+    # Create cache key from arguments
+    args_key <- paste(list(...), collapse = "_")
+    
+    # Check cache
+    if (exists(args_key, envir = cache)) {
+      cat("Cache hit!\n")
+      return(cache[[args_key]])
+    }
+    
+    # Calculate and cache
+    cat("Calculating...\n")
+    result <- fn(...)
+    cache[[args_key]] <- result
+    
+    return(result)
+  }
+}
+
+# Expensive PK calculation (simulated)
+expensive_pk_calc <- function(time, conc) {
+  Sys.sleep(1)  # Simulate expensive calculation
+  auc <- sum(diff(time) * (head(conc, -1) + tail(conc, -1))) / 2
+  return(auc)
+}
+
+# Create memoized version
+pk_calc_cached <- create_memoized_function(expensive_pk_calc)
+
+# First call:  slow
+system.time({
+  result1 <- pk_calc_cached(c(0, 1, 2, 4), c(0, 100, 80, 50))
+})
+
+# Second call with same args: fast
+system.time({
+  result2 <- pk_calc_cached(c(0, 1, 2, 4), c(0, 100, 80, 50))
+})
+
+result1 == result2
+```
+
+# Comprehensive Pharmaceutical Example
+
+Let's combine all concepts into a comprehensive clinical data analysis framework.
+
+```{r,eval=FALSE}
+# Advanced clinical data analysis framework
+
+# 1. Validation DSL
+validate <- function(data, ..., .error_action = c("warn", "stop", "collect")) {
+  .error_action <- match.arg(.error_action)
+  rules <- enquos(...)
+  errors <- list()
+  
+  for (i in seq_along(rules)) {
+    rule_quo <- rules[[i]]
+    rule_name <- names(rules)[i] %||% paste("Rule", i)
+    
+    # Evaluate rule
+    result <- eval_tidy(rule_quo, data = data)
+    
+    if (!all(result, na.rm = TRUE)) {
+      n_failed <- sum(!result, na.rm = TRUE)
+      error_msg <- sprintf("%s failed for %d records", rule_name, n_failed)
+      
+      if (.error_action == "stop") {
+        stop(error_msg)
+      } else if (.error_action == "warn") {
+        warning(error_msg)
+      } else {
+        errors[[rule_name]] <- list(
+          message = error_msg,
+          failed_rows = which(! result)
+        )
+      }
+    }
+  }
+  
+  if (.error_action == "collect") {
+    return(errors)
+  }
+  
+  invisible(data)
+}
+
+# 2. Flexible summarization with tidy eval
+summarize_endpoint <- function(data, 
+                               endpoint,
+                               by = NULL,
+                               stats = c("n", "mean", "sd", "median", "min", "max"),
+                               ...) {
+  endpoint_quo <- enquo(endpoint)
+  by_quo <- enquo(by)
+  additional_groups <- enquos(...)
+  
+  # Build summary expressions
+  stat_exprs <- list()
+  
+  if ("n" %in% stats) {
+    stat_exprs$n <- expr(sum(!is.na(!!endpoint_quo)))
+  }
+  if ("mean" %in% stats) {
+    stat_exprs$mean <- expr(mean(!!endpoint_quo, na.rm = TRUE))
+  }
+  if ("sd" %in% stats) {
+    stat_exprs$sd <- expr(sd(!! endpoint_quo, na.rm = TRUE))
+  }
+  if ("median" %in% stats) {
+    stat_exprs$median <- expr(median(!!endpoint_quo, na.rm = TRUE))
+  }
+  if ("min" %in% stats) {
+    stat_exprs$min <- expr(min(!!endpoint_quo, na.rm = TRUE))
+  }
+  if ("max" %in% stats) {
+    stat_exprs$max <- expr(max(!!endpoint_quo, na.rm = TRUE))
+  }
+  
+  # Build pipeline
+  if (quo_is_null(by_quo)) {
+    result <- data %>%
+      summarise(!!! stat_exprs)
+  } else {
+    result <- data %>%
+      group_by(!!by_quo, !!! additional_groups) %>%
+      summarise(!!!stat_exprs, .groups = "drop")
+  }
+  
+  return(result)
+}
+
+# 3. Analysis pipeline builder
+build_analysis_pipeline <- function(... ) {
+  steps <- enquos(...)
+  
+  function(data) {
+    result <- data
+    
+    for (i in seq_along(steps)) {
+      step <- steps[[i]]
+      step_name <- names(steps)[i] %||% paste("Step", i)
+      
+      cat("Executing:", step_name, "\n")
+      
+      # Evaluate step
+      result <- eval_tidy(step, data = list(.data = result))
+    }
+    
+    return(result)
+  }
+}
+
+# 4. Demo with comprehensive example
+demo_data <- data.frame(
+  subject_id = 1:20,
+  treatment = rep(c("Placebo", "Drug 50mg", "Drug 100mg", "Drug 150mg"), each = 5),
+  age = c(45, 52, 48, 55, 44, 50, 53, 47, 49, 51, 46, 54, 43, 57, 50, 48, 52, 45, 49, 54),
+  baseline_sbp = c(145, 152, 148, 155, 142, 150, 153, 147, 149, 151, 146, 154, 143, 157, 150,
+                   148, 152, 145, 149, 154),
+  week24_sbp = c(140, 145, 142, 148, 138, 138, 135, 132, 136, 140, 130, 128, 125, 132, 135,
+                 128, 130, 127, 133, 136),
+  sex = rep(c("M", "F"), 10)
+) %>%
+  mutate(
+    change_sbp = week24_sbp - baseline_sbp,
+    age_group = cut(age, breaks = c(0, 50, 100), labels = c("<50", ">=50"))
+  )
+
+# Validate data
+validation_errors <- validate(
+  demo_data,
+  age_valid = age >= 18 & age <= 100,
+  sbp_valid = baseline_sbp >= 80 & baseline_sbp <= 200,
+  treatment_valid = treatment %in% c("Placebo", "Drug 50mg", "Drug 100mg", "Drug 150mg"),
+  .error_action = "collect"
+)
+
+if (length(validation_errors) == 0) {
+  cat("✓ All validation rules passed\n\n")
+} else {
+  cat("✗ Validation errors found:\n")
+  print(validation_errors)
+}
+
+# Summarize endpoint by treatment
+cat("Summary by Treatment:\n")
+summarize_endpoint(demo_data, change_sbp, by = treatment)
+
+cat("\nSummary by Treatment and Age Group:\n")
+summarize_endpoint(demo_data, change_sbp, by = treatment, age_group)
+
+cat("\nSummary by Treatment and Sex:\n")
+summarize_endpoint(demo_data, change_sbp, by = treatment, sex)
+
+# Build analysis pipeline
+my_analysis <- build_analysis_pipeline(
+  filter_step = filter(.data, ! is.na(change_sbp)),
+  summarize_step = summarize_endpoint(.data, change_sbp, by = treatment),
+  format_step = mutate(.data, mean = round(mean, 1), sd = round(sd, 2))
+)
+
+cat("\nExecuting Analysis Pipeline:\n")
+results <- my_analysis(demo_data)
+print(results)
+```
+
+# Summary and Best Practices
+
+## Key Takeaways
+
+### 1. Function Types
+
+- **Regular functions**: Standard R functions with named parameters
+- **Infix operators**: Custom `%op%` functions for readable code
+- **Replacement functions**:  Modify objects with `<-` syntax
+- **Anonymous functions**: Unnamed functions for functional programming
+- **Higher-order functions**: Functions that operate on functions
+- **Primitives**: Low-level C implementations
+
+### 2. Non-Standard Evaluation
+
+- **Base R NSE**: `substitute()`, `quote()`, `eval()`
+  - Flexible but hard to program with
+  - Doesn't work well with variables
+  
+- **Tidy Evaluation**: Modern solution
+  - `enquo()` + `!!` or use `{{ }}`
+  - `enquos()` + `!!!` for multiple arguments
+  - `:=` for dynamic names
+  - Works with both interactive and programmatic use
+
+### 3. Metaprogramming
+
+- Build and modify expressions programmatically
+- Create domain-specific languages
+- Generate functions dynamically
+- Inspect call stacks for debugging
+
+### 4. Evaluation Functions
+
+- `eval()`: Evaluate expressions in environments
+- `with()`/`within()`: Cleaner data frame operations
+- `do.call()`: Programmatic function calls
+- `match.call()`: Capture function calls
+- Environments for scoping and caching
+
+## Best Practices for Pharmaceutical Programming
+
+### 1. When to Use Each Technique
+
+```{r,eval=FALSE}
+# Use standard evaluation for simple cases
+calc_mean_standard <- function(data, col) {
+  mean(data[[col]], na.rm = TRUE)
+}
+
+# Use tidy eval when you want dplyr-like interface
+calc_mean_tidy <- function(data, col) {
+  data %>%
+    summarise(mean = mean({{ col }}, na.rm = TRUE))
+}
+
+# Use metaprogramming for code generation
+# (e.g., generating multiple similar functions)
+```
+
+### 2. Documentation
+
+- Always document what type of input your function expects
+- If using NSE, show examples with bare names and with variables
+- Document any special evaluation semantics
+
+### 3. Testing
+
+- Test with bare names
+- Test with character vectors (if supported)
+- Test with variables containing column names
+- Test in different contexts (interactive, inside functions, in packages)
+
+### 4. Error Messages
+
+```{r,eval=FALSE}
+# Good error messages for tidy eval functions
+better_summary <- function(data, var) {
+  # Capture for error messages
+  var_name <- as_label(enquo(var))
+  
+  if (! var_name %in% names(data)) {
+    stop(
+      sprintf("Column '%s' not found in data.\nAvailable columns: %s",
+              var_name,
+              paste(names(data), collapse = ", "))
+    )
+  }
+  
+  # Rest of function...
+}
+```
+
+## Resources
+
+### Books
+- **Advanced R** by Hadley Wickham (https://adv-r.hadley.nz/)
+- **Metaprogramming** sections particularly relevant
+
+### Package Documentation
+- **rlang**: https://rlang.r-lib.org/
+- **dplyr**:  https://dplyr.tidyverse.org/ (for tidy eval examples)
+
+### Articles
+- **Tidy Evaluation**: https://tidyeval.tidyverse.org/
+- **Programming with dplyr**: https://dplyr.tidyverse.org/articles/programming.html
+
+### Practice
+- Try converting base R functions to use tidy eval
+- Build a small DSL for your domain
+- Create function factories for repetitive tasks
+- Experiment with metaprogramming to reduce code duplication
+

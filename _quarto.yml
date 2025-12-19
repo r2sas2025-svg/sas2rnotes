@@ -3,7 +3,7 @@ project:
 
 book:
   title: "R tutorial: Beginner to Expert"
-  author: "Santhose"
+  author: "SriRam"
   date: today
   chapters:
     - index.qmd
@@ -11,6 +11,10 @@ book:
       chapters:
         - datatype_structure.qmd
         - datatype_structure_exercise.qmd
+    - part: "Advanced R"
+      chapters:
+        - advancedR.qmd
+        - package.qmd
     - part: "data manipulation"
     - intro.qmd
     - summary.qmd

@@ -1,14 +1,13 @@
 ---
 title: "R Fundamentals for SAS Users"
 subtitle: "Basic R Syntax - A Comprehensive Guide"
-author: "Your Name"
 date: today
 execute: 
   warning: false
   message: false
 ---
 
-# Introduction
+# Introduction {.unnumbered}
 
 This guide is designed for SAS users transitioning to R.  We'll cover fundamental R concepts by comparing them to familiar SAS constructs, providing comprehensive coverage of each topic.
 
@@ -35,7 +34,7 @@ library(haven)
 
 Understanding how R code is structured compared to SAS is fundamental to making the transition.
 
-: :: {.panel-tabset}
+:::{.panel-tabset}
 
 ## SAS
 ```sas
