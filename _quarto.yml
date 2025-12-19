@@ -13,7 +13,7 @@ book:
         - datatype_structure_exercise.qmd
     - part: "Advanced R"
       chapters:
-        - advancedR.qmd
+        - package.qmd
     - part: "data manipulation"
     - intro.qmd
     - summary.qmd
